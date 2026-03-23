@@ -1,24 +1,25 @@
-# README
+# MFG Core (製造業向け 生産・在庫管理システム)
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## 📖 プロジェクト概要 (Overview)
+本プロジェクトは、製造業における「正確な在庫管理」「生産工程の記録」「品質情報の連携」を実現するコアシステム（mfg_core）のプロトタイプです。
+最終的に「受注に基づいた生産計画と在庫予測」の自動化を目標として掲げ、段階的に開発を進めています。
 
-Things you may want to cover:
+## 🤖 開発アプローチとAIとの協働 (AI Assisted Learning)
+Railsの基礎学習から一歩進み、複雑な製造業ドメインの設計と開発手法を学ぶためのプロジェクトです。
+開発においては**生成AI（LLM）をメンターとして活用し、システム要件の切り出しや設計の壁打ち、実装時のペアプログラミング**を全面的に実施しています。以下のような上位の設計およびマネジメント能力を養うことを重視しています。
+*   大規模なER図から段階的なMVP（最小限に動く製品）を切り出す**要件定義能力**。
+*   AIへの適切な要件・仕様の指示と、出力されたコードの安全性の**検証能力**。
+*   AIの提案の背景（なぜそう書くのか）を理解しながら進めることによる、**自身の実装スキル（Rails基礎）およびシステム構成能力の向上**。
 
-* Ruby version
+## 🛡️ 今後の課題とアピールポイント (Roadmap & Security)
+初期フェーズでは「在庫のズレをなくす」ための基礎マスタと入出庫トランザクションの実装（MVP）からスタートし、段階的に機能を追加します。
+ポートフォリオとして自身の実力を示すため、ゆくゆくは以下の高度な実装に挑戦していく予定です。
+*   ユーザー認証機能および**厳格なセキュリティ・権限（Authorization）管理**。
+*   製造現場の作業員を模した「なりきり操作」とタブレット向けUIの最適化。
+*   過去実績データを用いた将来予測モジュールの構築。
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+## 🏗️ 関連ドキュメント (Documentation)
+プロジェクトの全体像や技術的な設計データは、以下のファイルで管理しています。
+*   [🛣️ 全体のロードマップ (PLAN)](./PLAN.md)
+*   [📜 要件定義書 (Requirements)](./docs/requirements.md)
+*   [🗂️ データベースER図 (Target Architecture)](./docs/architecture/er_diagram.md)

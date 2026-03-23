@@ -1,21 +1,18 @@
 ---
-description: Workflow integrating task planning and phase-based document management.
+description: Workflow for task planning and document management.
 ---
-# Context Formalization Workflow
-Use for multi-step tasks or large phase transitions.
+# Context Formalization Workflow (文脈・管理の定式化)
 
-## 1. Context Assessment
-- Proactively evaluate task complexity beforehand.
-- Suggest management files/processes with logical justifications (e.g., "for team consistency").
+## 1. Context Assessment (状況評価)
+- Evaluate complexity and suggest management files with logic.
 
-## 2. Planning (`PLAN.md`)
-For complex tasks:
-1. **Roadmap**: Propose and create `PLAN.md` to map the task.
-2. **Step-by-Step**: Execute in explicit, trackable steps.
-3. **Context Anchoring**: Always review `PLAN.md` status after interruptions.
+## 2. Planning (計画立案: PLAN.md)
+1. **Roadmap**: Propose `PLAN.md` to map the task.
+2. **Step-by-Step**: Execute in explicit steps.
+3. **Context Anchoring**: Review status after interruptions.
 
-## 3. Phase-based Documents
-Propose documents as project scales:
-- **Background**: `GEMINI.md`, `README.md` (business logic, context).
-- **Constraint**: `.editorconfig`, linters (enforcement).
-- **Strategy**: Ticket management, roadmaps.
+## 3. Phase-based Documents (フェーズ別ドキュメント)
+Propose as project scales:
+- **Background (背景)**: `GEMINI.md`, `README.md`.
+- **Constraint (制約)**: `.editorconfig`, linters.
+- **Strategy (戦略)**: Roadmaps, tickets.

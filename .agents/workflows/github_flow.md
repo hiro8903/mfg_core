@@ -29,8 +29,10 @@ After pushing a branch, you MUST follow this 2-step conversation protocol:
 
 1.  **Ask for Intent**: DO NOT simply instruct the user to go to GitHub. Instead, explicitly ask: 「プルリクエストを作成しますか？」
 2.  **Propose Draft**: If the user says "yes/OK", generate a draft PR Title and Description strictly following this Markdown template. **You MUST output the final text within a Markdown code block so the user can copy it easily.**
+    - **Note on Style**: The PR **Title** must use an English prefix (e.g., `feat:`, `chore:`, `docs:`) followed by a **Japanese** main subject (e.g., `feat: [新機能の役割]の実装`).
 
     ```markdown
+    [Draft PR Title Example: chore: [新機能]の追加]
     ## 概要 / Summary
     [Summarize the change]
 

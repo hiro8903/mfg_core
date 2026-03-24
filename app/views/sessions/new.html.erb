@@ -1,0 +1,19 @@
+<%# [意図] ログイン画面のテンプレート。ユーザーコードとパスワードでの認証に合わせてカスタマイズしている。 %>
+<%# [意味] `form_with url: session_path` は、入力内容を SessionsController#create アクションへ送信するフォームを作る。 %>
+
+<%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
+<%= tag.div(flash[:notice], style: "color:green") if flash[:notice] %>
+
+<%= form_with url: session_path do |form| %>
+  <%# [意図] メールアドレスではなく「ユーザーコード」で識別するため、入力フィールドを text_field に変更。 %>
+  <%# [意味] `text_field` は通常のテキスト入力欄を作る。`:user_code` がパラメーター名になる。 %>
+  <%# `autocomplete: "username"` はブラウザへのヒント（HTML5の規格で定められた固定値）で、 %>
+  <%# 「このフィールドにはログイン用のIDが入る」と伝える。カラム名とは無関係で、"username"のままが正しい。 %>
+  <%= form.text_field :user_code, required: true, autofocus: true, autocomplete: "username", placeholder: "ユーザーコードを入力" %><br>
+
+  <%# [意図] パスワードを入力するフィールド。入力内容が「●●●」のように隠れる。 %>
+  <%# [意味] `password_field` は入力内容を非表示にする専用の入力欄。`maxlength: 72` はbcryptの安全限界値。 %>
+  <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "パスワードを入力", maxlength: 72 %><br>
+
+  <%= form.submit "ログイン" %>
+<% end %>

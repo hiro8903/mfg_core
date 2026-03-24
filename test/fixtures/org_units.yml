@@ -1,0 +1,10 @@
+manufacturing_dept:
+  code: D100
+  name: 製造本部
+  org_type: 0
+
+mfg_section_1:
+  parent: manufacturing_dept
+  code: D110
+  name: 製造第1課
+  org_type: 0

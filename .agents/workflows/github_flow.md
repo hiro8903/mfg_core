@@ -1,5 +1,5 @@
 ---
-description: Enforce GitHub Flow to simulate team development.
+description: how to commit, push, and create pull requests following GitHub Flow. Apply this whenever the user wants to commit, push, merge, or create a PR.
 ---
 
 # GitHub Flow Workflow (チーム開発フロー)
@@ -20,6 +20,12 @@ When a task or sub-task is complete and ready to be committed, you MUST strictly
     *   **意訳**: `[Japanese translation of the message]`
     *   **接頭語の解説**: `[Detailed Japanese explanation of the commit prefix used, e.g., "feat (Feature/新機能): ユーザー向けに新しい機能を追加・実装した際によく使われる接頭語です。"]`
     *   **採用の理由**: `[Your brief reason/nuance for proposing this specific wording]`
+
+    After listing all 3 options, you MUST add a direct engineer's recommendation in this exact format. Be honest and opinionated — do NOT be vague or diplomatic:
+
+    ---
+    💬 **エンジニア的には【案X】がベストです。**
+    > `[1〜2文で「なぜこれが最も正確か」「他の案のどこが弱いか」を率直に述べる。シニアエンジニアがコードレビューで語りかけるような、歯に衣着せないトーンで書くこと。]`
 
 3.  **Execute**: Wait for the user to select an option number or provide a modified message. ONLY THEN use your tools to execute `git add`, `git commit`, and `git push` commands.
 

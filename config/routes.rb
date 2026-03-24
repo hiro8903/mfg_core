@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resource :session
+  resources :passwords, param: :token
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -9,6 +11,9 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # [意図] ログイン成功後のリダイレクト先（root_url）を定義するため。
+  #        現時点ではトップページが未作成のため、暫定的にヘルスチェックページを使用。
+  #        Step 3（マスタ管理）完成後に適切なダッシュボードへ変更する。
+  # [意味] `root "controller#action"` でアプリケーションの「/」へのアクセス先を決める。
+  root "rails/health#show"
 end

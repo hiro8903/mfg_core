@@ -21,5 +21,5 @@ class User < ApplicationRecord
   #        「abc 」と「abc」を同じものとして扱いたい。
   # [意味] `normalizes` は保存時に自動で値を変換してくれるメソッド。
   #        `strip` で前後の空白を除去し、入力ミスによる不一致を防ぐ。
-  normalizes :user_code, with: -> (c) { c.strip }
+  normalizes :user_code, with: ->(c) { c.strip }
 end

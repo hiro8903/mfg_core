@@ -6,5 +6,5 @@ class Assignment < ApplicationRecord
 
   # [意図] 辞令の有効期間を管理するため。
   validates :start_date, presence: true
-  validates :is_primary, inclusion: { in: [true, false] }
+  validates :is_primary, inclusion: { in: [ true, false ] }
 end

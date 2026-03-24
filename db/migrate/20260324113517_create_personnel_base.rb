@@ -54,7 +54,7 @@ class CreatePersonnelBase < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    add_index :locations, [:facility_id, :code], unique: true
+    add_index :locations, [ :facility_id, :code ], unique: true
 
     # 6. 在庫データ (Inventories: Hybrid Logical/Physical)
     create_table :inventories do |t|

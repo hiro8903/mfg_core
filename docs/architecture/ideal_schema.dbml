@@ -1,53 +1,80 @@
 Project Mfg_Core_Ideal_Architecture {
   database_type: 'PostgreSQL'
-  Note: '製造業中核アプリケーション：将来の理想的なデータ構造'
+  Note: '製造業中核アプリケーション：将来の理想的なデータ構造 (HR, OrgUnits & Inventory Hybrid)'
 }
 
-// -------------------- I. ユーザー・組織管理 (HR) --------------------
+// -------------------- I. ユーザー・組織・人事マスタ (HR) --------------------
 
 Table users {
   id integer [primary key]
   user_code varchar [unique, not null, note: 'ログイン用ID (業務コード)']
   name varchar [not null, note: '氏名（フルネーム）']
   password_digest varchar [not null, note: '暗号化されたパスワード']
+  discarded_at timestamp [note: '退職・無効化日 (NULLなら有効)']
   created_at timestamp
   updated_at timestamp
 
   Note: '本質的な個人情報を管理するテーブル'
 }
 
-Table locations {
+Table facilities {
   id integer [primary key]
-  code varchar [unique, not null, note: '拠点コード (例: L001)']
+  code varchar [unique, not null, note: '拠点・サイトコード (例: L001)']
   name varchar [not null, note: '拠点名 (例: 東京工場)']
   address text [note: '住所']
+  discarded_at timestamp [note: '拠点廃止日時 (NULLなら有効)']
 
-  Note: '物理的な場所（勤務地）を管理'
+  Note: '物理的な拠点（オフィス、工場等）を管理。人事上の配属先。'
 }
 
-Table departments {
+Table org_units {
   id integer [primary key]
-  parent_id integer [ref: > departments.id, note: '親部門 (階層構造用)']
-  code varchar [unique, not null, note: '部門コード (例: D100)']
-  name varchar [not null, note: '部門名 (例: 製造部)']
+  parent_id integer [ref: > org_units.id, note: '親組織 (階層構造用)']
+  code varchar [unique, not null, note: '組織コード (例: D100)']
+  name varchar [not null, note: '組織名 (例: 製造部, 製造1課, 安全委員会)']
+  org_type integer [default: 0, note: '組織種別 (0:部署, 1:PJ, 2:委員会)']
+  discarded_at timestamp [note: '組織廃止日時 (NULLなら有効)']
 
-  Note: '組織上の論理的な部門を管理'
+  Note: '論理的な組織単位（部・課・班およびプロジェクト）を統合管理'
 }
 
 Table assignments {
   id integer [primary key]
   user_id integer [not null, ref: > users.id]
-  location_id integer [not null, ref: > locations.id]
-  department_id integer [not null, ref: > departments.id]
-  job_title varchar [note: '仕事上の肩書き (例: 工場長)']
-  role integer [default: 0, note: 'システム上の権限種別 (Enum)']
-  start_date date [not null, note: '発令日']
-  end_date date [note: '失効日 (NULLなら現行)']
+  facility_id integer [not null, ref: > facilities.id]
+  org_unit_id integer [not null, ref: > org_units.id]
+  job_title varchar [note: '仕事上の肩書き (人間界の役割)']
+  role integer [default: 0, note: 'システム上の権限 (コンピューター界の許可証)']
+  is_primary boolean [default: true, note: '主属フラグ (兼務の場合のメイン所属)']
+  start_date date [not null, note: '適用開始日']
+  end_date date [note: '適用終了日 (NULLなら現行)']
 
   Note: '誰が・どこで・何の役割を「いつからいつまで」担っているかの履歴'
 }
 
-// -------------------- II. 認証・ログイン --------------------
+// -------------------- II. 在庫・場所管理 (Inventory & Storage) --------------------
+
+Table locations {
+  id integer [primary key]
+  facility_id integer [not null, ref: > facilities.id, note: '所属拠点']
+  code varchar [unique, not null, note: '場所コード (例: W001-S01-A)']
+  name varchar [not null, note: '場所名 (例: 倉庫A-棚B1)']
+  discarded_at timestamp [note: '場所廃止日時']
+
+  Note: '製品や資材の具体的な「物理的置き場所（棚・部屋等）」'
+}
+
+Table inventories {
+  id integer [primary key]
+  item_id integer [note: '品番マスタ参照用（将来拡張）']
+  org_unit_id integer [not null, ref: > org_units.id, note: '論理的所有組織 (必須・会計単位)']
+  location_id integer [ref: > locations.id, note: '物理的場所 (任意・棚卸単位)']
+  quantity decimal [not null, default: 0, note: '在庫数量']
+
+  Note: '【ハイブリッド設計】組織持分（論理）と置き場所（物理）を両立可能'
+}
+
+// -------------------- III. 認証・ログイン --------------------
 
 Table sessions {
   id integer [primary key]

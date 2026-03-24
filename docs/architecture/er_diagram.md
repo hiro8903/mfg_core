@@ -5,7 +5,7 @@
 
 ```mermaid
 erDiagram
-%% 製造業データモデル ER図 - Version 1.0
+%% 製造業データモデル ER図 - Version 2.0
 
 %% -------------------- I. 基礎・取引先マスタ --------------------
 "商品マスタ" {
@@ -42,22 +42,13 @@ erDiagram
     VARCHAR 住所
 }
 
-"部門マスタ" {
-    INT 部門_ID PK "連番 内部キー"
-    VARCHAR 所属グループ_コード "業務コード"
-    VARCHAR 部門名
-    VARCHAR 親グループ_コード FK "業務コード"
-    VARCHAR 階層レベル
-    DATE 有効終了日 "部門が廃止された日付 NULLなら有効"
-}
 
 "ロケーションマスタ" {
-    INT ロケーション_ID PK "連番 内部キー"
-    VARCHAR ロケーション_コード "業務コード"
-    VARCHAR ロケーション名
-    VARCHAR ロケーションタイプ "棚 ラック フロアなど"
-    DATE 有効開始日
-    DATE 有効終了日 "NULLの場合は現在有効"
+    INT id PK
+    INT 拠点ID FK "所属拠点"
+    VARCHAR 場所コード "場所コード (例: W001-S01-A)"
+    VARCHAR 場所名 "場所名 (例: 倉庫A-棚B1)"
+    DATETIME 廃止日時 "discarded_at"
 }
 
 "品番マスタ" {
@@ -110,41 +101,62 @@ erDiagram
 %% -------------------- III. ユーザー・組織・履歴管理 (HR & Organization) --------------------
 
 "ユーザーマスタ" {
-    INT id PK "サロゲートキー"
-    VARCHAR ユーザー_コード "ログインID (業務コード)"
+    INT id PK "users: 個人情報"
+    VARCHAR ユーザー_コード "ログインID"
     VARCHAR 名前 "氏名"
     VARCHAR 暗号化パスワード "password_digest"
+    DATETIME 廃止日付 "discarded_at"
 }
 
 "拠点マスタ" {
-    INT id PK
-    VARCHAR 拠点コード "拠点コード"
-    VARCHAR 拠点名 "東京工場、北海道工場等"
+    INT id PK "facilities: 営業拠点・拠点"
+    VARCHAR 拠点コード "コード"
+    VARCHAR 拠点名 "名称"
     VARCHAR 住所 "住所"
+    DATETIME 廃止日時 "discarded_at"
 }
 
-"部門マスタ" {
-    INT id PK
-    VARCHAR 部門コード "部門コード"
-    VARCHAR 部門名 "製造部、営業部等"
-    INT 親部門ID FK "親部門ID (階層管理用)"
+"組織単位マスタ" {
+    INT id PK "org_units: 部・課・PJ等"
+    INT 親組織ID FK "parent_id (階層)"
+    VARCHAR 組織コード "コード"
+    VARCHAR 組織名 "名称"
+    INT 組織種別 "0:部署, 1:PJ, 2:委員会"
+    DATETIME 廃止日時 "discarded_at"
 }
 
 "配属辞令履歴" {
-    INT id PK
-    INT ユーザーID FK "ユーザー参照"
-    INT 拠点ID FK "拠点参照"
-    INT 部門ID FK "部門参照"
-    VARCHAR 役職名 "人間界の肩書き (工場長など)"
-    INT システム権限 "システム権限(role) (管理者:1,一般:0)"
-    DATE 開始日 "適用開始日"
-    DATE 終了日 "適用終了日 (NULLなら現行)"
+    INT id PK "assignments: 人事履歴"
+    INT ユーザーID FK "user_id"
+    INT 拠点ID FK "facility_id"
+    INT 組織単位ID FK "org_unit_id"
+    VARCHAR 役職名 "job_title (肩書き)"
+    INT システム権限 "role (権限)"
+    BOOLEAN 主属フラグ "is_primary (メイン所属)"
+    DATE 開始日 "start_date"
+    DATE 終了日 "end_date"
+}
+
+"ロケーションマスタ" {
+    INT id PK "locations: 在庫の棚・場所"
+    INT 拠点ID FK "facility_id"
+    VARCHAR 場所コード "コード"
+    VARCHAR 場所名 "名称"
+    DATETIME 廃止日時 "discarded_at"
+}
+
+"セッションマスタ" {
+    INT id PK "sessions: 認証管理"
+    INT ユーザーID FK
+    VARCHAR IPアドレス
+    VARCHAR ユーザーエージェント
+    DATETIME 作成日時
 }
 
 "ユーザースキル関連" {
     INT id PK
     INT ユーザーID FK
-    INT スキルID FK
+    INT SKILL_ID FK
 }
 
 "人員賃率データ" {
@@ -162,6 +174,7 @@ erDiagram
     DECIMAL 設備費率
     VARCHAR 償却方法
 }
+
 
 "標準レシピマスタ" {
     INT レシピ_ID PK "連番 内部キー"
@@ -243,13 +256,12 @@ erDiagram
     VARCHAR 備考
 }
 
-"個別在庫データ" {
-    INT 在庫_ID PK "連番 内部キー"
-    VARCHAR 個別識別子 "業務コード"
-    INT 入荷明細_ID FK "業務コード"
-    VARCHAR 品番 FK "品番マスタを参照"
-    DECIMAL 現在数量 "在庫単位での数量 例: g"
-    VARCHAR ロケーション_コード FK "業務コード"
+"在庫データ" {
+    INT id PK "連番 内部キー"
+    INT 品番ID FK "将来拡張(item_id)"
+    INT 組織ユニットID FK "論理的所有組織 (必須)"
+    INT ロケーションID FK "物理的場所 (任意)"
+    DECIMAL 在庫数量 "quantity"
 }
 
 "在庫移動データ" {
@@ -334,12 +346,12 @@ erDiagram
 %% HR & Organization Relationships
 "ユーザーマスタ" ||--o{ "配属辞令履歴" : 履歴
 "拠点マスタ" ||--o{ "配属辞令履歴" : 拠点配属
-"部門マスタ" ||--o{ "配属辞令履歴" : 部門所属
-"部門マスタ" ||--o{ "部門マスタ" : 組織階層
+"組織単位マスタ" ||--o{ "配属辞令履歴" : 組織所属
+"組織単位マスタ" ||--o{ "組織単位マスタ" : 組織階層
 "ユーザーマスタ" ||--o{ "ユーザースキル関連" : 保有スキル
 "スキルマスタ" ||--o{ "ユーザースキル関連" : 必要要件
 "ユーザーマスタ" ||--o{ "人員賃率データ" : 標準原価設定
-"ユーザーマスタ" ||--o{ "セッション管理" : ログイン履歴
+"ユーザーマスタ" ||--o{ "セッションマスタ" : 認証
 
 "相手先名称マスタ" ||--o{ "受注データ" : 得意先
 "受注データ" ||--o{ "受注明細データ" : 構成
@@ -363,13 +375,15 @@ erDiagram
 "見積データ" ||--o{ "発注明細データ" : 適用見積
 "発注明細データ" ||--o{ "入荷明細データ" : 該当発注
 "入荷データ" ||--o{ "入荷明細データ" : 構成
-"ロケーションマスタ" ||--o{ "個別在庫データ" : 配置
+"拠点マスタ" ||--o{ "ロケーションマスタ" : 拠点内の場所
+"ロケーションマスタ" ||--o{ "在庫データ" : 配置
+"組織単位マスタ" ||--o{ "在庫データ" : 所有
+"品番マスタ" ||--o{ "在庫データ" : 品目
+"入荷明細データ" ||--o{ "在庫データ" : 発生元
 "ロケーションマスタ" ||--o{ "在庫移動データ" : 移動元
 "ロケーションマスタ" ||--o{ "在庫移動データ" : 移動先
-"入荷明細データ" ||--o{ "個別在庫データ" : 発生元
-"品番マスタ" ||--o{ "個別在庫データ" : 対象品
 "作業実績データ" ||--o{ "在庫移動データ" : 消費元
 "品番マスタ" ||--o{ "在庫移動データ" : 消費品
 "入荷明細データ" ||--o{ "在庫移動データ" : 原価元ロット
-"個別在庫データ" ||--o{ "在庫移動データ" : 原価元個別
+"在庫データ" ||--o{ "在庫移動データ" : 原価元個別
 ```

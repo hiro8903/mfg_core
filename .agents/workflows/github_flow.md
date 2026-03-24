@@ -24,8 +24,31 @@ When a task or sub-task is complete and ready to be committed, you MUST strictly
 3.  **Execute**: Wait for the user to select an option number or provide a modified message. ONLY THEN use your tools to execute `git add`, `git commit`, and `git push` commands.
 
 ## 3. Push & Pull Request (PR作成)
-- Push to remote: `git push origin feature/[name]`
-- PAUSE and instruct user to create PR on GitHub. (PR作成待ち)
+**[CRITICAL PR PROTOCOL]**
+After pushing a branch, you MUST follow this 2-step conversation protocol:
+
+1.  **Ask for Intent**: DO NOT simply instruct the user to go to GitHub. Instead, explicitly ask: 「プルリクエストを作成しますか？」
+2.  **Propose Draft**: If the user says "yes/OK", generate a draft PR Title and Description strictly following this Markdown template. **You MUST output the final text within a Markdown code block so the user can copy it easily.**
+
+    ```markdown
+    ## 概要 / Summary
+    [Summarize the change]
+
+    ## 実装機能 / Key Features
+    - [ ] [Feature 1]
+
+    ## 変更内容 / Key Changes
+    - [ ] [Change 1]
+
+    ## 設計上の意思決定と目的 / Design Decisions & Objectives
+    ### 1. [Decision 1]
+    - **理由**: [Rationale]
+
+    ## 補足 / Note
+    [Any extra info]
+    ```
+
+3.  **Instruction**: After the user approves or modifies the draft, PAUSE and provide the link to create the PR on GitHub.
 
 ## 4. Review & Merge (レビュー合体)
 - User acts as PM to review diff and merge to `main` on GitHub.

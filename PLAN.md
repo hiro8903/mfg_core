@@ -79,12 +79,25 @@
     - 💻 `bin/rails db:seed`
     - 登録モデル: `Facility`, `OrgUnit`, `Location`, `User`, `Assignment`
     - 📂 [`db/seeds.rb`](./db/seeds.rb)
-- [ ] 管理者が「ユーザーマスタ」を管理できる画面の実装。
-    - [ ] `index`: ユーザー一覧表示（所属組織・有効な権限のサマリー表示含む）。
-    - [ ] `new/create`: 新規ユーザー登録（パスワード初期設定含む）。
-    - [ ] `edit/update`: ユーザー基本情報の編集。
-    - [ ] `destroy` (Discard): ユーザーの論理削除（退職・無効化処理）。
-    - [ ] **配属管理**: ユーザーを組織（OrgUnit）や拠点（Facility）に紐付ける `assignments` の登録・更新機能。
+- [x] **ADR 004: 論理削除の方針とトレーサビリティの確保**
+    - 📄 [`004-logical-deletion-policy.md`](./docs/architecture/adr/004-logical-deletion-policy.md)
+    - 決定: 物理削除を禁じ、`discarded_at` による論理削除を一貫して採用する。
+- [x] **ユーザーマスタ管理画面の実装**: 管理者がユーザー情報を操作できる基盤を構築。
+    - [x] `index`: ユーザー一覧表示（所属組織・拠点の表示含む）。
+        - 📂 [`app/views/users/index.html.erb`](./app/views/users/index.html.erb)
+    - [x] `show`: ユーザー詳細表示（配属履歴と継承パスワード権限の可視化）。
+        - 📂 [`app/views/users/show.html.erb`](./app/views/users/show.html.erb)
+    - [x] `new/create`: 新規ユーザー登録。
+        - 📂 [`app/views/users/new.html.erb`](./app/views/users/new.html.erb)
+    - [x] **UI/UX の刷新**: 全画面共通のデザイン基盤（Layout）と通知システム（Flash）の導入。
+        - 📂 [`app/views/layouts/application.html.erb`](./app/views/layouts/application.html.erb)
+    - [x] **フォームの共通部品化 (Refactoring)**: `new` と `edit` で共通して使う入力欄を切り出し。
+        - 📂 [`app/views/users/_form.html.erb`](./app/views/users/_form.html.erb)
+    - [x] `edit/update`: ユーザー基本情報の編集。
+        - 📂 [`app/views/users/edit.html.erb`](./app/views/users/edit.html.erb)
+    - [x] `destroy` (Discard): ユーザーの論理削除（退職・無効化処理）。
+        - 📂 [`app/controllers/users_controller.rb`](./app/controllers/users_controller.rb) / [`app/views/users/index.html.erb`](./app/views/users/index.html.erb)
+    - [ ] **配属管理の高度化**: 画面から組織（OrgUnit）や拠点（Facility）を動的に紐付ける機能。
     - [ ] **認可（Pundit）**: `manage_users` 権限を持つユーザーのみが上記操作を行えるようにガード。
 - [ ] 一般ユーザー用のログイン・ログアウト機能の実装。
 

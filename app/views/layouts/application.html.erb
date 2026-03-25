@@ -23,7 +23,17 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <%= yield %>
+  <body style="background-color: #f3f4f6; color: #111827; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <main style="max-width: 64rem; margin: 0 auto; padding: 2rem 1rem;">
+      <%# 通知メッセージの表示 %>
+      <% if notice %>
+        <p style="background-color: #dcfce7; color: #166534; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; border: 1px solid #bbf7d0; font-weight: 500;"><%= notice %></p>
+      <% end %>
+      <% if alert %>
+        <p style="background-color: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; border: 1px solid #fecaca; font-weight: 500;"><%= alert %></p>
+      <% end %>
+
+      <%= yield %>
+    </main>
   </body>
 </html>

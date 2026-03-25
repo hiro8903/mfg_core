@@ -8,14 +8,45 @@
 
 ### Step 1: 開発環境の基礎固め
 - [x] `rails new`直後の初期状態と今回の初期設定を **Git** にコミットする。
+  - 💻 `rails new mfg_core --database=postgresql`
+  - 📂 [`Gemfile`](./Gemfile) / [`config/database.yml`](./config/database.yml)
 - [x] テーブル構成を自動でDBML（設計図）として出力・管理するツールの導入。
+  - 💻 `bin/rake dbml:export` — 実行ごとに `db/schema.dbml` を最新化
+  - 💻 `npx dbdocs build docs/architecture/ideal_schema.dbml --project mfg-core-ideal` — Web 公開
+  - 📂 [`lib/tasks/dbml.rake`](./lib/tasks/dbml.rake) — 自動生成スクリプト
+  - 📄 [`db/schema.dbml`](./db/schema.dbml) — 実装の最新スキーマ
+  - 📄 [`docs/architecture/ideal_schema.dbml`](./docs/architecture/ideal_schema.dbml) — 設計上の理想スキーマ
+  - 🌐 [dbdocs.io (mfg-core-ideal)](https://dbdocs.io/hiro8903/mfg-core-ideal) — Web 公開版 ER 図
 
 ### Step 2: 認証とユーザーマスタ (Rails 8 Native Authentication)
 - [x] Rails 8 公式認証ジェネレーターを用いた基礎認証基盤の構築。
+  - 💻 `bin/rails generate authentication`
+  - 📂 [`app/models/user.rb`](./app/models/user.rb) / [`app/models/session.rb`](./app/models/session.rb)
+  - 📂 `app/controllers/sessions_controller.rb`
 - [x] `User` モデルを「ユーザーコード」で認証するようにカスタマイズ。
-- [x] アーキテクチャ設計の記録（ADR 001, 002）の作成。システム権限 `system_role` の設計判断を含む。
-- [ ] `users.system_role` カラムの追加 migration の適用・モデル反映（`enum :system_role`）。
-- [ ] 管理者のみがユーザーを作成・編集できる「ユーザーマスタ画面」の作成。
+  - 💻 `bin/rails generate migration AddUserCodeToUsers user_code:string:uniq`
+  - 💻 `bin/rails db:migrate`
+  - 📂 [`app/models/user.rb`](./app/models/user.rb)
+- [x] アーキテクチャ設計の記録（ADR 001, 002, 003）の作成。組織ベースの動的権限継承モデルの決定。
+  - 📄 [`docs/architecture/adr/001-authentication-choice.md`](./docs/architecture/adr/001-authentication-choice.md)
+  - 📄 [`docs/architecture/adr/002-personnel-and-organization-structure.md`](./docs/architecture/adr/002-personnel-and-organization-structure.md)
+  - 📄 [`docs/architecture/adr/003-permission-management.md`](./docs/architecture/adr/003-permission-management.md)
+  - 📄 [`docs/architecture/er_diagram.md`](./docs/architecture/er_diagram.md)
+- [x] 組織情報 (`OrgUnit`) および 組織権限 (`OrgUnitPermission`) のテーブル実装。
+  - 💻 `bin/rails generate model OrgUnit code:string name:string org_type:integer parent:references`
+  - 💻 `bin/rails generate migration CreateOrgUnitPermissions org_unit:references permission:integer:index`
+  - 💻 `bin/rails db:migrate`
+  - 📂 [`db/migrate/20260324113517_create_personnel_base.rb`](./db/migrate/20260324113517_create_personnel_base.rb)
+  - 📂 [`db/migrate/20260325004515_create_org_unit_permissions.rb`](./db/migrate/20260325004515_create_org_unit_permissions.rb)
+  - 📂 [`app/models/org_unit.rb`](./app/models/org_unit.rb) / [`app/models/org_unit_permission.rb`](./app/models/org_unit_permission.rb)
+  - 📂 [`app/models/assignment.rb`](./app/models/assignment.rb)
+- [ ] 管理者が「ユーザーマスタ」を管理できる画面の実装。
+    - [ ] `index`: ユーザー一覧表示（所属組織・有効な権限のサマリー表示含む）。
+    - [ ] `new/create`: 新規ユーザー登録（パスワード初期設定含む）。
+    - [ ] `edit/update`: ユーザー基本情報の編集。
+    - [ ] `destroy` (Discard): ユーザーの論理削除（退職・無効化処理）。
+    - [ ] **配属管理**: ユーザーを組織（OrgUnit）や拠点（Facility）に紐付ける `assignments` の登録・更新機能。
+    - [ ] **認可（Pundit）**: `manage_users` 権限を持つユーザーのみが上記操作を行えるようにガード。
 - [ ] 一般ユーザー用のログイン・ログアウト機能の実装。
 
 ### Step 3: 調達・在庫向け 基礎マスタデータの構築 (Foundation)

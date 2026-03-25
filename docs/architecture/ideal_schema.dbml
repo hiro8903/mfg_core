@@ -1,6 +1,6 @@
 Project Mfg_Core_Ideal_Architecture {
   database_type: 'PostgreSQL'
-  Note: '製造業中核アプリケーション：将来の理想的なデータ構造 (HR, OrgUnits & Inventory Hybrid)'
+  Note: '製造業中核アプリケーション：将来の理想的なデータ構造 (Dynamic Permissions & HR Support)'
 }
 
 // -------------------- I. ユーザー・組織・人事マスタ (HR) --------------------
@@ -14,7 +14,7 @@ Table users {
   created_at timestamp
   updated_at timestamp
 
-  Note: '本質的な個人情報を管理するテーブル'
+  Note: '本質的な個人情報を管理。認証の主体。'
 }
 
 Table facilities {
@@ -35,7 +35,17 @@ Table org_units {
   org_type integer [default: 0, note: '組織種別 (0:部署, 1:PJ, 2:委員会)']
   discarded_at timestamp [note: '組織廃止日時 (NULLなら有効)']
 
-  Note: '論理的な組織単位（部・課・班およびプロジェクト）を統合管理'
+  Note: '論理的な組織単位。ここに権限が紐付く。'
+}
+
+Table org_unit_permissions {
+  id integer [primary key]
+  org_unit_id integer [not null, ref: > org_units.id, note: '組織ID']
+  permission integer [not null, note: '権限種別 (system_admin, manage_hr, view_inventory等)']
+  created_at timestamp
+  updated_at timestamp
+
+  Note: '【ADR 003】組織に権限を紐付け、配属によってユーザーへ継承させる'
 }
 
 Table assignments {
@@ -44,12 +54,12 @@ Table assignments {
   facility_id integer [not null, ref: > facilities.id]
   org_unit_id integer [not null, ref: > org_units.id]
   job_title varchar [note: '仕事上の肩書き (人間界の役割)']
-  role integer [default: 0, note: 'システム上の権限 (コンピューター界の許可証)']
+  role integer [default: 0, note: '配属役職区分 (0:作業員, 1:管理者等)']
   is_primary boolean [default: true, note: '主属フラグ (兼務の場合のメイン所属)']
   start_date date [not null, note: '適用開始日']
   end_date date [note: '適用終了日 (NULLなら現行)']
 
-  Note: '誰が・どこで・何の役割を「いつからいつまで」担っているかの履歴'
+  Note: '【ADR 002】誰が・どこで・何の役割を「いつからいつまで」担っているかの履歴'
 }
 
 // -------------------- II. 在庫・場所管理 (Inventory & Storage) --------------------
@@ -61,7 +71,7 @@ Table locations {
   name varchar [not null, note: '場所名 (例: 倉庫A-棚B1)']
   discarded_at timestamp [note: '場所廃止日時']
 
-  Note: '製品や資材の具体的な「物理的置き場所（棚・部屋等）」'
+  Note: '物理的置き場所（棚・部屋等）'
 }
 
 Table inventories {
@@ -71,7 +81,7 @@ Table inventories {
   location_id integer [ref: > locations.id, note: '物理的場所 (任意・棚卸単位)']
   quantity decimal [not null, default: 0, note: '在庫数量']
 
-  Note: '【ハイブリッド設計】組織持分（論理）と置き場所（物理）を両立可能'
+  Note: '論理的所有と物理場所を両立させるハイブリッド設計'
 }
 
 // -------------------- III. 認証・ログイン --------------------
@@ -84,5 +94,5 @@ Table sessions {
   created_at timestamp
   updated_at timestamp
 
-  Note: 'Rails 8 Native Authenticationのためのセッション管理'
+  Note: 'Rails 8 Native Authentication'
 }

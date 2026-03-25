@@ -11,6 +11,9 @@ class OrgUnit < ApplicationRecord
   # [意図] この組織が所有している在庫データを引くため。
   has_many :inventories, dependent: :destroy
 
+  # [意図] 【ADR 003】組織に紐付く権限を取得するため。
+  has_many :org_unit_permissions, dependent: :destroy
+
   validates :code, presence: true, uniqueness: true
   validates :name, presence: true
 end

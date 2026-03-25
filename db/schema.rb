@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_24_113517) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_25_004515) do
   create_table "assignments", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.date "end_date"
@@ -61,6 +61,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_113517) do
     t.index ["facility_id"], name: "index_locations_on_facility_id"
   end
 
+  create_table "org_unit_permissions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "org_unit_id", null: false
+    t.integer "permission", null: false
+    t.datetime "updated_at", null: false
+    t.index ["org_unit_id"], name: "index_org_unit_permissions_on_org_unit_id"
+    t.index ["permission"], name: "index_org_unit_permissions_on_permission"
+  end
+
   create_table "org_units", force: :cascade do |t|
     t.string "code", null: false
     t.datetime "created_at", null: false
@@ -100,6 +109,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_113517) do
   add_foreign_key "inventories", "locations"
   add_foreign_key "inventories", "org_units"
   add_foreign_key "locations", "facilities"
+  add_foreign_key "org_unit_permissions", "org_units"
   add_foreign_key "org_units", "org_units", column: "parent_id"
   add_foreign_key "sessions", "users"
 end

@@ -3,43 +3,82 @@
 このドキュメントは、プロジェクト全体の道筋を整理し、現在どこにいるかを見失わないための **Map（地図）** です。
 タスクが完了するごとにチェック（`[x]`）を入れて進捗を管理します。
 
-## 📍 フェーズ 1: MVP（調達プロセスと在庫管理の基礎）
-目標: モノの入り口（発注・入荷）から在庫の決定までを一気通貫で流し、「在庫のズレをなくす」基盤を構築する。
+## 📍 フェーズ 1: MVP（人事組織・調達プロセスと在庫管理の基礎）
+目標: **組織・権限基盤を確立し、** モノの入り口（発注・入荷）から在庫の決定までを一気通貫で流し、「在庫のズレをなくす」基盤を構築する。
 
 ### Step 1: 開発環境の基礎固め
-- [x] `rails new`直後の初期状態と今回の初期設定を **Git** にコミットする。
-  - 💻 `rails new mfg_core --database=postgresql`
-  - 📂 [`Gemfile`](./Gemfile) / [`config/database.yml`](./config/database.yml)
-- [x] テーブル構成を自動でDBML（設計図）として出力・管理するツールの導入。
-  - 💻 `bin/rake dbml:export` — 実行ごとに `db/schema.dbml` を最新化
-  - 💻 `npx dbdocs build docs/architecture/ideal_schema.dbml --project mfg-core-ideal` — Web 公開
-  - 📂 [`lib/tasks/dbml.rake`](./lib/tasks/dbml.rake) — 自動生成スクリプト
-  - 📄 [`db/schema.dbml`](./db/schema.dbml) — 実装の最新スキーマ
-  - 📄 [`docs/architecture/ideal_schema.dbml`](./docs/architecture/ideal_schema.dbml) — 設計上の理想スキーマ
-  - 🌐 [dbdocs.io (mfg-core-ideal)](https://dbdocs.io/hiro8903/mfg-core-ideal) — Web 公開版 ER 図
+- [x] **プロジェクトの雛形作成 (Project Scaffolding)**: `rails new` による開発の土台（箱）の用意。
+    - 💻 `rails new mfg_core`
+    - [x] **使用 DB の事前確認**: DBML 連携の準備として DB 種類を確認。
+        - 📂 [`config/database.yml`](./config/database.yml): デフォルトの SQLite3 を使用。
+- [x] **DBML 連携**: テーブル構成の自動設計図出力ツールの導入（開発進捗を反映させるため）。
+    - [x] 自動出力用 Rake タスクの作成。
+        - 📂 [`lib/tasks/dbml.rake`](./lib/tasks/dbml.rake)
+    - [x] スキーマの自動書き出し。
+        - 💻 `bin/rake dbml:export`
+        - 📂 [`db/schema.dbml`](./db/schema.dbml)
+    - [x] DBML 設計図の Web 公開。
+        - 💻 `npx dbdocs build docs/architecture/ideal_schema.dbml --project mfg-core-ideal`
+        - 📂 [`docs/architecture/ideal_schema.dbml`](./docs/architecture/ideal_schema.dbml)
+        - https://dbdocs.io/hiro8903/mfg-core-ideal
 
 ### Step 2: 認証とユーザーマスタ (Rails 8 Native Authentication)
-- [x] Rails 8 公式認証ジェネレーターを用いた基礎認証基盤の構築。
-  - 💻 `bin/rails generate authentication`
-  - 📂 [`app/models/user.rb`](./app/models/user.rb) / [`app/models/session.rb`](./app/models/session.rb)
-  - 📂 `app/controllers/sessions_controller.rb`
-- [x] `User` モデルを「ユーザーコード」で認証するようにカスタマイズ。
-  - 💻 `bin/rails generate migration AddUserCodeToUsers user_code:string:uniq`
-  - 💻 `bin/rails db:migrate`
-  - 📂 [`app/models/user.rb`](./app/models/user.rb)
-- [x] アーキテクチャ設計の記録（ADR 001, 002, 003）の作成。組織ベースの動的権限継承モデルの決定。
-  - 📄 [`docs/architecture/adr/001-authentication-choice.md`](./docs/architecture/adr/001-authentication-choice.md)
-  - 📄 [`docs/architecture/adr/002-personnel-and-organization-structure.md`](./docs/architecture/adr/002-personnel-and-organization-structure.md)
-  - 📄 [`docs/architecture/adr/003-permission-management.md`](./docs/architecture/adr/003-permission-management.md)
-  - 📄 [`docs/architecture/er_diagram.md`](./docs/architecture/er_diagram.md)
-- [x] 組織情報 (`OrgUnit`) および 組織権限 (`OrgUnitPermission`) のテーブル実装。
-  - 💻 `bin/rails generate model OrgUnit code:string name:string org_type:integer parent:references`
-  - 💻 `bin/rails generate migration CreateOrgUnitPermissions org_unit:references permission:integer:index`
-  - 💻 `bin/rails db:migrate`
-  - 📂 [`db/migrate/20260324113517_create_personnel_base.rb`](./db/migrate/20260324113517_create_personnel_base.rb)
-  - 📂 [`db/migrate/20260325004515_create_org_unit_permissions.rb`](./db/migrate/20260325004515_create_org_unit_permissions.rb)
-  - 📂 [`app/models/org_unit.rb`](./app/models/org_unit.rb) / [`app/models/org_unit_permission.rb`](./app/models/org_unit_permission.rb)
-  - 📂 [`app/models/assignment.rb`](./app/models/assignment.rb)
+- [x] **ADR 001: 認証方式の選定**
+    - 📄 [`001-authentication-choice.md`](./docs/architecture/adr/001-authentication-choice.md)
+    - 決定: Rails 8 公式認証をベースに `user_code` 認証でカスタマイズする。
+    - 📂 ER 図（初版）: [`docs/architecture/er_diagram.md`](./docs/architecture/er_diagram.md)
+    - 📂 ER 図（初版）: [`docs/architecture/ideal_schema.dbml`](./docs/architecture/ideal_schema.dbml)
+- [x] **認証基盤構築**: ADR 001 の決定に基づき Rails 8 公式認証機能を実装。
+    - [x] **認証用 Gem の有効化**: パスワード暗号化の準備。
+        - 📂 [`Gemfile`](./Gemfile): `gem "bcrypt"` を有効化（コメントアウト解除）。
+    - [x] 基盤生成の実施。
+        - 💻 `bin/rails generate authentication`
+        - 📂 [`app/models/user.rb`](./app/models/user.rb) / [`app/models/session.rb`](./app/models/session.rb)
+- [x] **CI 環境の正常化**: デフォルト生成された GitHub Actions やテストの不備修正。
+    - [x] デフォルトのワークフロー定義の不備修正（バージョン指定ミス等の解消）。
+        - 💻 [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) の修正。
+    - [x] デフォルト生成されたテストファイル群の修正・整理。
+        - [x] 独自設計（`user_code` 認証）と競合するテストを一時的に `skip` して CI 正常化。
+            - 📂 対象: [`passwords_controller_test.rb`](./test/controllers/passwords_controller_test.rb) / [`sessions_controller_test.rb`](./test/controllers/sessions_controller_test.rb) / [`user_test.rb`](./test/models/user_test.rb)
+- [x] **ユーザーコード認証**: ログイン ID を業務コードにカスタマイズ。
+    - [x] 生成されたマイグレーションの `email` 欄を `user_code` に**手動で書き換え**。
+        - 編集ファイル: `bin/rails generate authentication` で生成されたマイグレーションファイルを1次改修
+    - [x] `User` モデルに `normalizes :user_code` や `has_many :assignments` を手動追記。
+    - [x] **初期動作確認 (Console(コンソール): 操作画面)**: 業務コードでのユーザー登録・認証検証。
+        - 💻 `bin/rails console` -> `User.create!(user_code: "U001", ...)` -> `user.authenticate("...")`
+    - 📂 [`app/models/user.rb`](./app/models/user.rb)
+- [x] **組織・在庫基盤の DB 実装**
+    - [x] **ADR 002: 人事・組織構造の設計**
+        - 📄 [`002-personnel-and-organization-structure.md`](./docs/architecture/adr/002-personnel-and-organization-structure.md)
+        - 決定: `assignments`, `org_units`, `facilities`, `locations` の設計。
+        - 📂 ER 図（再設計）: [`docs/architecture/er_diagram.md`](./docs/architecture/er_diagram.md)
+        - 📂 ER 図（再設計）: [`docs/architecture/ideal_schema.dbml`](./docs/architecture/ideal_schema.dbml)
+    - [x] **ADR の設計に従いマイグレーションファイルを手書き**。
+        - 📂 [`db/migrate/20260324113517_create_personnel_base.rb`](./db/migrate/20260324113517_create_personnel_base.rb)
+        - 対象テーブル: `users`, `facilities`, `org_units`, `assignments`, `locations`, `inventories`, `sessions`
+    - [x] リレーション設定（has_many, belongs_to 等）
+        - 📂 モデル: [`User`](./app/models/user.rb) / [`Facility`](./app/models/facility.rb) / [`OrgUnit`](./app/models/org_unit.rb) / [`Assignment`](./app/models/assignment.rb) / [`Location`](./app/models/location.rb) / [`Inventory`](./app/models/inventory.rb) / [`Session`](./app/models/session.rb)
+    - [x] DB への反映。
+        - 💻 `bin/rails db:migrate`
+    - [x] 現状の ER 図を出力。
+        - 💻 `bin/rake dbml:export`
+        - 📂 ER 図（実績）: [`db/schema.dbml`](./db/schema.dbml)
+- [x] **ADR 003: 権限管理モデルの刷新**（承認後、`org_unit_permissions` 実装へ着手）。
+    - 📄 [`003-permission-management.md`](./docs/architecture/adr/003-permission-management.md)
+    - 決定: `users.system_role` を廃止し、`org_unit_permissions` テーブルで動的権限継承へ移行。
+    - 📂 ER 図（目標）: [`docs/architecture/er_diagram.md`](./docs/architecture/er_diagram.md)
+    - 📂 ER 図（目標）: [`docs/architecture/ideal_schema.dbml`](./docs/architecture/ideal_schema.dbml)
+- [x] **組織権限テーブルの追加**: ADR 003 の決定に基づき `org_unit_permissions` を実装。
+    - 📂 [`db/migrate/20260325004515_create_org_unit_permissions.rb`](./db/migrate/20260325004515_create_org_unit_permissions.rb)
+    - 📂 モデル: [`OrgUnitPermission`](./app/models/org_unit_permission.rb)
+    - 💻 `bin/rails db:migrate`
+    - [x] 現状の ER 図を出力。
+        - 💻 `bin/rake dbml:export`
+        - 📂 ER 図（実績）: [`db/schema.dbml`](./db/schema.dbml)
+- [x] **テストデータ投入 (Seed: 初期データの種まき)**。
+    - 💻 `bin/rails db:seed`
+    - 登録モデル: `Facility`, `OrgUnit`, `Location`, `User`, `Assignment`
+    - 📂 [`db/seeds.rb`](./db/seeds.rb)
 - [ ] 管理者が「ユーザーマスタ」を管理できる画面の実装。
     - [ ] `index`: ユーザー一覧表示（所属組織・有効な権限のサマリー表示含む）。
     - [ ] `new/create`: 新規ユーザー登録（パスワード初期設定含む）。

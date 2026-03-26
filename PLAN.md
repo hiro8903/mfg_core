@@ -101,6 +101,15 @@
     - [ ] **認可（Pundit）**: `manage_users` 権限を持つユーザーのみが上記操作を行えるようにガード。
 - [ ] 一般ユーザー用のログイン・ログアウト機能の実装。
 
+### Step 2.5: フロントエンド標準化 (Frontend Standardization)
+- [x] **ADR 005: フロントエンド技術選定 (Hotwire + Tailwind CSS)**
+    - 📄 [`005-frontend-stack-selection.md`](./docs/architecture/adr/005-frontend-stack-selection.md)
+    - 決定: Hotwire + Tailwind を主軸とし、特定の高度な UI のみ React/Vue 導入を検討する。
+- [ ] **ユーザーマスタ画面のリファクタリング**: ドラフト版（暫定 UI）を ADR 005 および TIL ガイドに従って刷新。
+    - [ ] 全画面（index, show, new, edit）のインラインスタイルを Tailwind クラスへ完全移行。
+    - [ ] 汎用 UI コンポーネント（ボタン、バッジ、カード等）を `shared/` パーシャルへ抽出。
+    - [ ] モバイルファーストなレスポンシブ対応の実施。
+
 ### Step 3: 調達・在庫向け 基礎マスタデータの構築 (Foundation)
 - [ ] `品番マスタ`（メーカー名含む） および `商品マスタ` の構築。
 - [ ] `相手先名称マスタ`（仕入先）、`発送先マスタ`（納品先）、`ロケーションマスタ` の構築。

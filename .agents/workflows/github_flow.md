@@ -42,15 +42,15 @@ After pushing a branch, you MUST follow this 2-step conversation protocol:
     ## 概要 / Summary
     [Summarize the change]
 
-    ## 実装機能 / Key Features
-    - [ ] [Feature 1]
+    ## 実施コマンド / Commands Executed
+    - [ ] `bin/rails generate ...`
+    - [ ] `bin/rake ...`
 
     ## 変更内容 / Key Changes
-    - [ ] [Change 1]
+    - [ ] **[ファイルパス]**: [変更の論理的要約] (e.g. `User`モデルに`discard`を導入)
 
     ## 設計上の意思決定と目的 / Design Decisions & Objectives
-    ### 1. [Decision 1]
-    - **理由**: [Rationale]
+    - **[意思決定の内容]**: [理由・背景]
 
     ## 補足 / Note
     [Any extra info]

@@ -1,0 +1,53 @@
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+  <div style="display: flex; gap: 1rem; border-bottom: 2px solid #e5e7eb;">
+    <%= link_to "現職 (Active)", users_path, style: "padding: 0.5rem 1rem; text-decoration: none; border-bottom: 2px solid #{params[:discarded] != 'true' ? '#2563eb' : 'transparent'}; color: #{params[:discarded] != 'true' ? '#2563eb' : '#6b7280'}; font-weight: 600;" %>
+    <%= link_to "退職済み (Retired)", users_path(discarded: true), style: "padding: 0.5rem 1rem; text-decoration: none; border-bottom: 2px solid #{params[:discarded] == 'true' ? '#2563eb' : 'transparent'}; color: #{params[:discarded] == 'true' ? '#2563eb' : '#6b7280'}; font-weight: 600;" %>
+  </div>
+  <%= link_to "新規登録 (New)", new_user_path, style: "background: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; text-decoration: none; font-weight: 500;" %>
+</div>
+
+<div style="overflow-x: auto; background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb;">
+  <table style="width: 100%; border-collapse: collapse; text-align: left;">
+    <thead style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+      <tr>
+        <th style="padding: 0.75rem 1rem; font-weight: 600; color: #374151;">業務 ID</th>
+        <th style="padding: 0.75rem 1rem; font-weight: 600; color: #374151;">氏名 (Name)</th>
+        <th style="padding: 0.75rem 1rem; font-weight: 600; color: #374151;">主な所属組織 (Org Unit)</th>
+        <th style="padding: 0.75rem 1rem; font-weight: 600; color: #374151;">拠点 (Facility)</th>
+        <th style="padding: 0.75rem 1rem; font-weight: 600; color: #374151; text-align: center;">操作 (Action)</th>
+      </tr>
+    </thead>
+    <tbody style="divide-y: 1px solid #f3f4f6;">
+      <% @users.each do |user| %>
+        <tr style="border-bottom: 1px solid #f3f4f6;">
+          <td style="padding: 1rem; font-family: monospace; color: #111827;"><%= user.user_code %></td>
+          <td style="padding: 1rem; color: #111827; font-weight: 500;"><%= user.name %></td>
+          <td style="padding: 1rem; color: #4b5563;">
+            <%# 現在の有効な所属を簡易表示 %>
+            <%= user.assignments.find_by("start_date <= ? AND (end_date IS NULL OR end_date >= ?)", Date.today, Date.today)&.org_unit&.name || "-" %>
+          </td>
+          <td style="padding: 1rem; color: #4b5563;">
+            <%# 所属拠点の一覧をカンマ区切りで表示 %>
+            <%= user.facilities.map(&:name).join(", ").presence || "-" %>
+          </td>
+          <td style="padding: 1rem; text-align: center;">
+            <div style="display: flex; gap: 0.5rem; justify-content: center;">
+              <%= link_to "詳細", user_path(user), style: "color: #2563eb; text-decoration: none; font-size: 0.875rem;" %>
+              <%= link_to "編集", edit_user_path(user), style: "color: #059669; text-decoration: none; font-size: 0.875rem;" %>
+              
+              <% if user.discarded_at.present? %>
+                <%# 退職済みの場合は復職ボタンを表示 %>
+                <%= link_to "復職", undiscard_user_path(user), data: { turbo_method: :patch, turbo_confirm: "復職処理の訂正（現職への復帰）を行いますか？" }, 
+                            style: "color: #2563eb; text-decoration: none; font-size: 0.875rem; font-weight: 600;" %>
+              <% else %>
+                <%# 現職の場合は退職ボタンを表示 %>
+                <%= link_to "退職", user_path(user), data: { turbo_method: :delete, turbo_confirm: "本当に退職処理（無効化）してもよろしいですか？" }, 
+                            style: "color: #dc2626; text-decoration: none; font-size: 0.875rem;" %>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -108,6 +108,12 @@ erDiagram
     DATETIME 廃止日付 "discarded_at"
 }
 
+"組織権限マスタ" {
+    INT id PK "org_unit_permissions: 権限定義"
+    INT 組織単位ID FK "org_unit_id"
+    INT 権限種別 "permission: 0=admin, 1=user_mgmt..."
+}
+
 "拠点マスタ" {
     INT id PK "facilities: 営業拠点・拠点"
     VARCHAR 拠点コード "コード"
@@ -131,7 +137,7 @@ erDiagram
     INT 拠点ID FK "facility_id"
     INT 組織単位ID FK "org_unit_id"
     VARCHAR 役職名 "job_title (肩書き)"
-    INT システム権限 "role (権限)"
+    INT 配属役職区分 "role: 0=作業員, 1=管理者等（配属先での役割）"
     BOOLEAN 主属フラグ "is_primary (メイン所属)"
     DATE 開始日 "start_date"
     DATE 終了日 "end_date"
@@ -348,6 +354,7 @@ erDiagram
 "拠点マスタ" ||--o{ "配属辞令履歴" : 拠点配属
 "組織単位マスタ" ||--o{ "配属辞令履歴" : 組織所属
 "組織単位マスタ" ||--o{ "組織単位マスタ" : 組織階層
+"組織単位マスタ" ||--o{ "組織権限マスタ" : 権限付与
 "ユーザーマスタ" ||--o{ "ユーザースキル関連" : 保有スキル
 "スキルマスタ" ||--o{ "ユーザースキル関連" : 必要要件
 "ユーザーマスタ" ||--o{ "人員賃率データ" : 標準原価設定

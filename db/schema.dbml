@@ -1,1 +1,141 @@
+Table "facilities" {
+  "id" integer [pk, not null]
+  "code" varchar [not null]
+  "name" varchar [not null]
+  "address" text
+  "discarded_at" datetime(6)
+  "created_at" datetime(6) [not null]
+  "updated_at" datetime(6) [not null]
 
+  Indexes {
+    code [unique, name: "index_facilities_on_code"]
+    discarded_at [name: "index_facilities_on_discarded_at"]
+  }
+}
+
+Table "org_units" {
+  "id" integer [pk, not null]
+  "parent_id" integer
+  "code" varchar [not null]
+  "name" varchar [not null]
+  "org_type" integer [not null, default: 0]
+  "discarded_at" datetime(6)
+  "created_at" datetime(6) [not null]
+  "updated_at" datetime(6) [not null]
+
+  Indexes {
+    parent_id [name: "index_org_units_on_parent_id"]
+    code [unique, name: "index_org_units_on_code"]
+    discarded_at [name: "index_org_units_on_discarded_at"]
+  }
+}
+
+Table "assignments" {
+  "id" integer [pk, not null]
+  "user_id" integer [not null]
+  "facility_id" integer [not null]
+  "org_unit_id" integer [not null]
+  "job_title" varchar
+  "role" integer [not null, default: 0]
+  "is_primary" boolean [not null, default: true]
+  "start_date" date [not null]
+  "end_date" date
+  "created_at" datetime(6) [not null]
+  "updated_at" datetime(6) [not null]
+
+  Indexes {
+    user_id [name: "index_assignments_on_user_id"]
+    facility_id [name: "index_assignments_on_facility_id"]
+    org_unit_id [name: "index_assignments_on_org_unit_id"]
+  }
+}
+
+Table "locations" {
+  "id" integer [pk, not null]
+  "facility_id" integer [not null]
+  "code" varchar [not null]
+  "name" varchar [not null]
+  "discarded_at" datetime(6)
+  "created_at" datetime(6) [not null]
+  "updated_at" datetime(6) [not null]
+
+  Indexes {
+    facility_id [name: "index_locations_on_facility_id"]
+    discarded_at [name: "index_locations_on_discarded_at"]
+    (facility_id, code) [unique, name: "index_locations_on_facility_id_and_code"]
+  }
+}
+
+Table "inventories" {
+  "id" integer [pk, not null]
+  "item_id" integer
+  "org_unit_id" integer [not null]
+  "location_id" integer
+  "quantity" decimal(15,5) [not null, default: 0.0]
+  "created_at" datetime(6) [not null]
+  "updated_at" datetime(6) [not null]
+
+  Indexes {
+    org_unit_id [name: "index_inventories_on_org_unit_id"]
+    location_id [name: "index_inventories_on_location_id"]
+  }
+}
+
+Table "sessions" {
+  "id" integer [pk, not null]
+  "user_id" integer [not null]
+  "ip_address" varchar
+  "user_agent" varchar
+  "created_at" datetime(6) [not null]
+  "updated_at" datetime(6) [not null]
+
+  Indexes {
+    user_id [name: "index_sessions_on_user_id"]
+  }
+}
+
+Table "users" {
+  "id" integer [pk, not null]
+  "user_code" varchar [not null]
+  "name" varchar [not null]
+  "password_digest" varchar [not null]
+  "discarded_at" datetime(6)
+  "created_at" datetime(6) [not null]
+  "updated_at" datetime(6) [not null]
+
+  Indexes {
+    user_code [unique, name: "index_users_on_user_code"]
+    discarded_at [name: "index_users_on_discarded_at"]
+  }
+}
+
+Table "org_unit_permissions" {
+  "id" integer [pk, not null]
+  "org_unit_id" integer [not null]
+  "permission" integer [not null]
+  "created_at" datetime(6) [not null]
+  "updated_at" datetime(6) [not null]
+
+  Indexes {
+    org_unit_id [name: "index_org_unit_permissions_on_org_unit_id"]
+    permission [name: "index_org_unit_permissions_on_permission"]
+  }
+}
+
+Ref "fk_rails_54c0512b74":"org_units"."id" < "org_units"."parent_id"
+
+Ref "fk_rails_aa6b76dac2":"users"."id" < "assignments"."user_id"
+
+Ref "fk_rails_075936001b":"facilities"."id" < "assignments"."facility_id"
+
+Ref "fk_rails_9f093fe183":"org_units"."id" < "assignments"."org_unit_id"
+
+Ref "fk_rails_bd5e419ecb":"facilities"."id" < "locations"."facility_id"
+
+Ref "fk_rails_759ff3e2b4":"org_units"."id" < "inventories"."org_unit_id"
+
+Ref "fk_rails_f563371c64":"locations"."id" < "inventories"."location_id"
+
+Ref "fk_rails_758836b4f0":"users"."id" < "sessions"."user_id"
+
+Ref "fk_rails_5028ae19e7":"org_units"."id" < "org_unit_permissions"."org_unit_id"

@@ -1,11 +1,11 @@
-<div class="max-w-2xl mx-auto py-10">
-  <div class="flex justify-between items-center mb-8">
-    <div>
-      <h1 class="m-0 text-3xl font-bold text-gray-900 border-l-4 border-blue-600 pl-4">ユーザー情報更新 (Edit User)</h1>
-      <p class="mt-1 text-gray-500 text-sm">登録されているユーザー情報を変更します</p>
-    </div>
-    <%= link_to "表示に戻る (Show)", @user, class: "bg-white text-gray-700 px-4 py-2 border border-gray-300 rounded-md no-underline font-medium text-sm hover:bg-gray-50 shadow-sm" %>
-  </div>
+<%# [意図] ユーザー情報編集画面のヘッダーを共通コンポーネントで統一し、ブランドイメージを維持するため。 %>
+<%# [意味] タイトル、サブテキスト、および「表示に戻る」ボタンを配置したヘッダー領域。 %>
+<%= render "shared/page_header",
+    title: "ユーザー情報更新 (Edit User)",
+    subtitle: "登録されているユーザー情報を変更します",
+    actions: capture { %>
+      <%= link_to "表示に戻る (Show)", @user, class: "bg-white text-gray-700 px-4 py-2 border border-gray-300 rounded-md no-underline font-medium text-sm hover:bg-gray-50 shadow-sm" %>
+<% } %>
 
   <%= render "form", user: @user %>
 </div>

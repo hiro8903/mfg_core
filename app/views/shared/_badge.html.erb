@@ -1,0 +1,16 @@
+<%# [意図] 状態（Status）や権限などの付加情報を、背景色とラベルで直感的に識別できるようにするため。 %>
+<%# [意味] 指定された色（color）と文字（label）で、丸いタグ（Badge）を生成する部品。 %>
+<%
+  color_classes = case color.to_sym
+                  when :red     then "bg-red-100 text-red-700 border-red-200"
+                  when :green   then "bg-green-100 text-green-700 border-green-200"
+                  when :emerald then "bg-emerald-100 text-emerald-700 border-emerald-200"
+                  when :blue    then "bg-blue-100 text-blue-700 border-blue-200"
+                  when :gray    then "bg-gray-100 text-gray-700 border-gray-200"
+                  else "bg-gray-100 text-gray-700 border-gray-200"
+                  end
+%>
+
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border <%= color_classes %> <%= local_assigns[:class] %>">
+  <%= label %>
+</span>

@@ -1,0 +1,15 @@
+<%# [意図] 白背景・角丸・影といった「器」のデザインを標準化し、情報のまとまりを視覚的に分かりやすくするため。 %>
+<%# [意味] 中身（yield）を自由に流し込める、汎用的なカード型コンテナコンポーネント。 %>
+<div class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm <%= local_assigns[:class] %>">
+  <% if local_assigns[:title] %>
+    <%# カードのヘッダー部分 %>
+    <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 font-semibold text-gray-700">
+      <%= title %>
+    </div>
+  <% end %>
+  
+  <%# カードのメインコンテンツ部分 %>
+  <div class="<%= local_assigns[:body_class] || 'p-6' %>">
+    <%= yield %>
+  </div>
+</div>

@@ -1,10 +1,10 @@
-<div style="max-width: 42rem; margin: 0 auto;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<div class="max-w-2xl mx-auto py-10">
+  <div class="flex justify-between items-center mb-8">
     <div>
-      <h1 style="margin: 0; font-size: 1.875rem; font-weight: 700;">ユーザー情報の編集 (Edit User)</h1>
-      <p style="margin: 0.25rem 0 0; color: #6b7280; font-size: 0.875rem;">登録済みの情報を更新します</p>
+      <h1 class="m-0 text-3xl font-bold text-gray-900 border-l-4 border-blue-600 pl-4">ユーザー情報更新 (Edit User)</h1>
+      <p class="mt-1 text-gray-500 text-sm">登録されているユーザー情報を変更します</p>
     </div>
-    <%= link_to "詳細に戻る (Back)", user_path(@user), style: "background: white; color: #374151; padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; text-decoration: none; font-weight: 500; font-size: 0.875rem;" %>
+    <%= link_to "表示に戻る (Show)", @user, class: "bg-white text-gray-700 px-4 py-2 border border-gray-300 rounded-md no-underline font-medium text-sm hover:bg-gray-50 shadow-sm" %>
   </div>
 
   <%= render "form", user: @user %>

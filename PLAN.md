@@ -101,6 +101,17 @@
     - [ ] **認可（Pundit）**: `manage_users` 権限を持つユーザーのみが上記操作を行えるようにガード。
 - [ ] 一般ユーザー用のログイン・ログアウト機能の実装。
 
+### Step 2.5: フロントエンド標準化 (Frontend Standardization)
+- [x] **ADR 005: フロントエンド技術選定 (Hotwire + Tailwind CSS)**
+    - 📄 [`005-frontend-stack-selection.md`](./docs/architecture/adr/005-frontend-stack-selection.md)
+    - 決定: Hotwire + Tailwind を主軸とし、特定の高度な UI のみ React/Vue 導入を検討する。
+- [x] **Rails 8 + Tailwind v4 標準化の確立**: Propshaft の `:app` 魔法による自動解決の検証と文書化。
+    - 📂 [`rails8-tailwind-v4-standard-setup.md`](./til/[Ruby]_[Fw]_Rails-Frontend-Standard/rails8-tailwind-v4-standard-setup.md)
+- [x] **ユーザーマスタ画面のリファクタリング**: ドラフト版（暫定 UI）を ADR 005 および TIL ガイドに従って刷新。
+    - [x] 全画面（index, show, new, edit, _form）のインラインスタイルを Tailwind クラスへ完全移行。
+    - [x] モバイルファーストなレスポンシブレイアウトの導入。
+- [ ] **汎用 UI コンポーネント（ボタン、バッジ、カード等）の抽出**: 実装したクラスを `shared/` パーシャルへ共通化し、DRY を徹底する。
+
 ### Step 3: 調達・在庫向け 基礎マスタデータの構築 (Foundation)
 - [ ] `品番マスタ`（メーカー名含む） および `商品マスタ` の構築。
 - [ ] `相手先名称マスタ`（仕入先）、`発送先マスタ`（納品先）、`ロケーションマスタ` の構築。

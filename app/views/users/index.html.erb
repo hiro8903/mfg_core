@@ -1,48 +1,59 @@
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-  <div style="display: flex; gap: 1rem; border-bottom: 2px solid #e5e7eb;">
-    <%= link_to "現職 (Active)", users_path, style: "padding: 0.5rem 1rem; text-decoration: none; border-bottom: 2px solid #{params[:discarded] != 'true' ? '#2563eb' : 'transparent'}; color: #{params[:discarded] != 'true' ? '#2563eb' : '#6b7280'}; font-weight: 600;" %>
-    <%= link_to "退職済み (Retired)", users_path(discarded: true), style: "padding: 0.5rem 1rem; text-decoration: none; border-bottom: 2px solid #{params[:discarded] == 'true' ? '#2563eb' : 'transparent'}; color: #{params[:discarded] == 'true' ? '#2563eb' : '#6b7280'}; font-weight: 600;" %>
+<%# 上部アクションエリア：フレックス配置、余白1.5rem %>
+<div class="flex justify-between items-center mb-6">
+  <%# タブナビゲーション：表示条件に合わせたボーダーと色の切り替えロジックを継承 %>
+  <div class="flex gap-4 border-b-2 border-gray-200">
+    <%= link_to "現職 (Active)", users_path,
+        class: "px-4 py-2 no-underline font-semibold border-b-2 #{params[:discarded] != 'true' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}" %>
+    <%= link_to "退職済み (Retired)", users_path(discarded: true),
+        class: "px-4 py-2 no-underline font-semibold border-b-2 #{params[:discarded] == 'true' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}" %>
   </div>
-  <%= link_to "新規登録 (New)", new_user_path, style: "background: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; text-decoration: none; font-weight: 500;" %>
+
+  <%# 新規登録ボタン：角丸3.75(rounded)、ウェイト500 %>
+  <%= link_to "新規登録 (New)", new_user_path,
+      class: "bg-blue-600 text-white px-4 py-2 rounded-md no-underline font-medium hover:bg-blue-700" %>
 </div>
 
-<div style="overflow-x: auto; background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb;">
-  <table style="width: 100%; border-collapse: collapse; text-align: left;">
-    <thead style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+<%# カード風コンテナ：角丸0.5rem、影、境界線 %>
+<div class="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
+  <table class="w-full border-collapse text-left">
+    <%# ヘッダー：背景グレー50、下線 %>　
+    <thead class="bg-gray-50 border-b border-gray-200">
       <tr>
-        <th style="padding: 0.75rem 1rem; font-weight: 600; color: #374151;">業務 ID</th>
-        <th style="padding: 0.75rem 1rem; font-weight: 600; color: #374151;">氏名 (Name)</th>
-        <th style="padding: 0.75rem 1rem; font-weight: 600; color: #374151;">主な所属組織 (Org Unit)</th>
-        <th style="padding: 0.75rem 1rem; font-weight: 600; color: #374151;">拠点 (Facility)</th>
-        <th style="padding: 0.75rem 1rem; font-weight: 600; color: #374151; text-align: center;">操作 (Action)</th>
+        <th class="px-4 py-3 font-semibold text-gray-700">業務 ID</th>
+        <th class="px-4 py-3 font-semibold text-gray-700">氏名 (Name)</th>
+        <th class="px-4 py-3 font-semibold text-gray-700">主な所属組織 (Org Unit)</th>
+        <th class="px-4 py-3 font-semibold text-gray-700">拠点 (Facility)</th>
+        <th class="px-4 py-3 font-semibold text-gray-700 text-center">操作 (Action)</th>
       </tr>
     </thead>
-    <tbody style="divide-y: 1px solid #f3f4f6;">
+    <%# 行間にグレー100の区切り線 %>
+    <tbody class="divide-y divide-gray-100">
       <% @users.each do |user| %>
-        <tr style="border-bottom: 1px solid #f3f4f6;">
-          <td style="padding: 1rem; font-family: monospace; color: #111827;"><%= user.user_code %></td>
-          <td style="padding: 1rem; color: #111827; font-weight: 500;"><%= user.name %></td>
-          <td style="padding: 1rem; color: #4b5563;">
-            <%# 現在の有効な所属を簡易表示 %>
+        <tr class="border-b border-gray-50">
+          <td class="p-4 font-mono text-gray-900"><%= user.user_code %></td>
+          <td class="p-4 text-gray-900 font-medium"><%= user.name %></td>
+          <td class="p-4 text-gray-600">
+            <%# 元の所属判定ロジックをそのまま継承 %>
             <%= user.assignments.find_by("start_date <= ? AND (end_date IS NULL OR end_date >= ?)", Date.today, Date.today)&.org_unit&.name || "-" %>
           </td>
-          <td style="padding: 1rem; color: #4b5563;">
-            <%# 所属拠点の一覧をカンマ区切りで表示 %>
+          <td class="p-4 text-gray-600">
+            <%# 元の拠点取得ロジックをそのまま継承 %>
             <%= user.facilities.map(&:name).join(", ").presence || "-" %>
           </td>
-          <td style="padding: 1rem; text-align: center;">
-            <div style="display: flex; gap: 0.5rem; justify-content: center;">
-              <%= link_to "詳細", user_path(user), style: "color: #2563eb; text-decoration: none; font-size: 0.875rem;" %>
-              <%= link_to "編集", edit_user_path(user), style: "color: #059669; text-decoration: none; font-size: 0.875rem;" %>
-              
+          <td class="p-4 text-center">
+            <div class="flex gap-2 justify-center">
+              <%= link_to "詳細", user_path(user), class: "text-blue-600 no-underline text-sm" %>
+              <%= link_to "編集", edit_user_path(user), class: "text-emerald-600 no-underline text-sm" %>
+
+              <%# 複雑な条件分岐もしっかり維持 %>
               <% if user.discarded_at.present? %>
-                <%# 退職済みの場合は復職ボタンを表示 %>
-                <%= link_to "復職", undiscard_user_path(user), data: { turbo_method: :patch, turbo_confirm: "復職処理の訂正（現職への復帰）を行いますか？" }, 
-                            style: "color: #2563eb; text-decoration: none; font-size: 0.875rem; font-weight: 600;" %>
+                <%= link_to "復職", undiscard_user_path(user),
+                            data: { turbo_method: :patch, turbo_confirm: "復職処理の訂正（現職への復帰）を行いますか？" },
+                            class: "text-blue-600 no-underline text-sm font-semibold" %>
               <% else %>
-                <%# 現職の場合は退職ボタンを表示 %>
-                <%= link_to "退職", user_path(user), data: { turbo_method: :delete, turbo_confirm: "本当に退職処理（無効化）してもよろしいですか？" }, 
-                            style: "color: #dc2626; text-decoration: none; font-size: 0.875rem;" %>
+                <%= link_to "退職", user_path(user),
+                            data: { turbo_method: :delete, turbo_confirm: "本当に退職処理（無効化）してもよろしいですか？" },
+                            class: "text-red-600 no-underline text-sm" %>
               <% end %>
             </div>
           </td>

@@ -3,13 +3,13 @@
 
 <%# [意図] 共通の見出しコンポーネントを使用し、詳細表示の一貫性を保つため。 %>
 <%# [意味] 編集画面や一覧画面への遷移ボタンを右側に備えた、タイトルセクション。 %>
-<%= render "shared/page_header", 
+<%= render "shared/page_header",
     title: "ユーザー詳細 (User Profile)",
     subtitle: "登録されている個人の情報を表示しています",
     actions: capture { %>
-      <%= link_to "一覧に戻る (Back)", users_path, class: "bg-white text-gray-700 px-4 py-2 border border-gray-300 rounded-md no-underline font-medium text-sm hover:bg-gray-50 shadow-sm transition-colors" %>
-      <%= link_to "編集する (Edit)", edit_user_path(@user), class: "bg-blue-600 text-white px-4 py-2 rounded-md no-underline font-medium text-sm hover:bg-blue-700 shadow-sm transition-colors" %>
-<% } %>
+      <%= render "shared/button", label: "一覧に戻る (Back)", path: users_path, color: :white %>
+      <%= render "shared/button", label: "編集する (Edit)", path: edit_user_path(@user), color: :green %>
+    <% } %>
 
 <%# メインコンテンツ：グリッド配置（左に基本情報、右に配属履歴） %>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -29,9 +29,9 @@
         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 text-gray-400">ステータス</label>
         <div class="mt-1">
           <% if @user.discarded_at.present? %>
-            <%= render "shared/badge", color: :red, label: "退職済み (Retired)" %>
+            <%= render "shared/badge", color: :gray, label: "退職済み (Retired)" %>
           <% else %>
-            <%= render "shared/badge", color: :emerald, label: "現職 (Active)" %>
+            <%= render "shared/badge", color: :green, label: "現職 (Active)" %>
           <% end %>
         </div>
       </div>

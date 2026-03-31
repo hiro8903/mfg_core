@@ -4,8 +4,8 @@
     title: "ユーザー情報更新 (Edit User)",
     subtitle: "登録されているユーザー情報を変更します",
     actions: capture { %>
-      <%= link_to "表示に戻る (Show)", @user, class: "bg-white text-gray-700 px-4 py-2 border border-gray-300 rounded-md no-underline font-medium text-sm hover:bg-gray-50 shadow-sm" %>
-<% } %>
+      <%= render "shared/button", label: "表示に戻る (Show)", path: @user, color: :white %>
+    <% } %>
 
   <%= render "form", user: @user %>
 </div>

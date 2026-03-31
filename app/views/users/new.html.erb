@@ -4,8 +4,8 @@
     title: "新規ユーザー登録 (New User)",
     subtitle: "システムを利用する新しいメンバーを追加します",
     actions: capture { %>
-      <%= link_to "キャンセル (Back)", users_path, class: "bg-white text-gray-700 px-4 py-2 border border-gray-300 rounded-md no-underline font-medium text-sm hover:bg-gray-50 shadow-sm" %>
-<% } %>
+      <%= render "shared/button", label: "一覧に戻る (Back)", path: users_path, color: :gray %>
+    <% } %>
 
   <%= render "form", user: @user %>
 </div>

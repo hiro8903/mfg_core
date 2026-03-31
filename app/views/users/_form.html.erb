@@ -37,7 +37,11 @@
       </div>
 
       <div class="pt-4 mt-4 border-t border-gray-100 text-base">
-        <%= f.submit user.new_record? ? "ユーザーを登録する (Register)" : "情報を更新する (Update)", class: "w-full bg-blue-600 text-white p-3 rounded-md font-semibold cursor-pointer text-base hover:bg-blue-700 shadow-sm" %>
+        <%= render "shared/button", 
+              label: (user.new_record? ? "ユーザーを登録する (Register)" : "情報を更新する (Update)"), 
+              form: f, 
+              color: :blue, 
+              class: "w-full py-3 text-base" %>
       </div>
 
     <% end %>

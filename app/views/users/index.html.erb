@@ -17,10 +17,9 @@
         </div>
         
         <%# 新規登録ボタン %>
-        <%= link_to "新規登録 (New)", new_user_path, 
-            class: "bg-blue-600 text-white px-4 py-2 rounded-md no-underline font-medium hover:bg-blue-700 shadow-sm" %>
+        <%= render "shared/button", label: "新規登録 (New)", path: new_user_path, color: :blue %>
       </div>
-<% } %>
+    <% } %>
 
 <%# 共通カード部品の適用（テーブル表示のため内部余白はなし） %>
 <%= render "shared/card", body_class: "overflow-x-auto" do %>
@@ -32,7 +31,7 @@
         <th class="px-4 py-3 font-semibold text-gray-700">氏名 (Name)</th>
         <th class="px-4 py-3 font-semibold text-gray-700">主な所属組織 (Org Unit)</th>
         <th class="px-4 py-3 font-semibold text-gray-700">拠点 (Facility)</th>
-        <th class="px-4 py-3 font-semibold text-gray-700 text-center">操作 (Action)</th>
+        <th class="px-4 py-3 font-semibold text-gray-700 text-center w-60 whitespace-nowrap">操作 (Action)</th>
       </tr>
     </thead>
     <%# 行間にグレー100の区切り線 %>
@@ -49,20 +48,18 @@
             <%# 元の拠点取得ロジックをそのまま継承 %>
             <%= user.facilities.map(&:name).join(", ").presence || "-" %>
           </td>
-          <td class="p-4 text-center">
+          <td class="p-4 text-center whitespace-nowrap">
             <div class="flex gap-2 justify-center">
-              <%= link_to "詳細", user_path(user), class: "text-blue-600 no-underline text-sm" %>
-              <%= link_to "編集", edit_user_path(user), class: "text-emerald-600 no-underline text-sm" %>
+              <%= render "shared/button", label: "詳細", path: user_path(user), color: :white, class: "text-xs" %>
+              <%= render "shared/button", label: "編集", path: edit_user_path(user), color: :green, class: "text-xs" %>
 
-              <%# 複雑な条件分岐もしっかり維持 %>
+              <%# ステータスに応じたボタンの色の切り替え %>
               <% if user.discarded_at.present? %>
-                <%= link_to "復職", undiscard_user_path(user),
-                            data: { turbo_method: :patch, turbo_confirm: "復職処理の訂正（現職への復帰）を行いますか？" },
-                            class: "text-blue-600 no-underline text-sm font-semibold" %>
+                <%= render "shared/button", label: "復職", path: undiscard_user_path(user), 
+                      color: :blue, method: :patch, confirm: "復職処理の訂正（現職への復帰）を行いますか？", class: "text-xs" %>
               <% else %>
-                <%= link_to "退職", user_path(user),
-                            data: { turbo_method: :delete, turbo_confirm: "本当に退職処理（無効化）してもよろしいですか？" },
-                            class: "text-red-600 no-underline text-sm" %>
+                <%= render "shared/button", label: "退職", path: user_path(user), 
+                      color: :red, method: :delete, confirm: "本当に退職処理（無効化）してもよろしいですか？", class: "text-xs" %>
               <% end %>
             </div>
           </td>

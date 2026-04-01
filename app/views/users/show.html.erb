@@ -1,79 +1,80 @@
-<%# ページヘッダー %>
-<div class="flex justify-between items-center mb-8 pb-6 border-b border-gray-200">
-  <div>
-    <h1 class="text-3xl font-bold text-gray-900 border-l-4 border-blue-600 pl-4">ユーザー詳細 (User Profile)</h1>
-    <p class="mt-1 text-gray-500 text-sm">登録されている個人の情報を表示しています</p>
-  </div>
-  <div class="flex gap-4">
-    <%= link_to "一覧に戻る (Back)", users_path, class: "bg-white text-gray-700 px-4 py-2 border border-gray-300 rounded-md no-underline font-medium text-sm hover:bg-gray-50 shadow-sm transition-colors" %>
-    <%= link_to "編集する (Edit)", edit_user_path(@user), class: "bg-blue-600 text-white px-4 py-2 rounded-md no-underline font-medium text-sm hover:bg-blue-700 shadow-sm transition-colors" %>
-  </div>
-</div>
+<%# [意図] 従業員の基本プロフィールと、過去の配属履歴・保持権限を一覧で把握するため。 %>
+<%# [意味] 特定のユーザー情報を詳細に表示し、ステータス（現職／退職）を確認・管理する画面。 %>
+
+<%# [意図] 共通の見出しコンポーネントを使用し、詳細表示の一貫性を保つため。 %>
+<%# [意味] 編集画面や一覧画面への遷移ボタンを右側に備えた、タイトルセクション。 %>
+<%= render "shared/page_header",
+    title: "ユーザー詳細 (User Profile)",
+    subtitle: "登録されている個人の情報を表示しています",
+    actions: capture { %>
+      <%= render "shared/button", label: "一覧に戻る (Back)", path: users_path, color: :white %>
+      <%= render "shared/button", label: "編集する (Edit)", path: edit_user_path(@user), color: :green %>
+    <% } %>
 
 <%# メインコンテンツ：グリッド配置（左に基本情報、右に配属履歴） %>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
   <%# 1. 基本情報カード（1/3幅） %>
-  <div class="md:col-span-1 bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm h-fit">
-    <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 font-semibold text-gray-700">
-      基本情報 (Basic Info)
-    </div>
-    <div class="p-6 flex flex-col gap-6">
+  <div class="md:col-span-1">
+    <%= render "shared/card", title: "基本情報 (Basic Info)", class: "h-fit", body_class: "p-6 flex flex-col gap-6" do %>
       <div>
-        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">業務 ID</label>
-        <span class="text-lg font-mono font-bold text-gray-900"><%= @user.user_code %></span>
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 text-gray-400">業務 ID</label>
+        <div class="text-xl font-mono font-bold text-gray-900 border-b border-gray-100 pb-2"><%= @user.user_code %></div>
       </div>
       <div>
-        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">氏名</label>
-        <span class="text-lg font-semibold text-gray-900"><%= @user.name %></span>
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 text-gray-400">氏名</label>
+        <div class="text-2xl font-bold text-gray-900"><%= @user.name %></div>
       </div>
-    </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 text-gray-400">ステータス</label>
+        <div class="mt-1">
+          <% if @user.discarded_at.present? %>
+            <%= render "shared/badge", color: :gray, label: "退職済み (Retired)" %>
+          <% else %>
+            <%= render "shared/badge", color: :green, label: "現職 (Active)" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
   </div>
 
   <%# 2. 配属履歴カード（2/3幅） %>
-  <div class="md:col-span-2 flex flex-col gap-6">
-    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-      <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 font-semibold text-gray-700">
-        配属履歴と保持権限 (Assignments & Permissions)
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full border-collapse text-left">
-          <thead class="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th class="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">期間 (Period)</th>
-              <th class="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">所属組織 (Org Unit)</th>
-              <th class="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">取得される権限 (Permissions)</th>
+  <div class="md:col-span-2">
+    <%= render "shared/card", title: "配属履歴と保持権限 (Assignments & Permissions)", body_class: "p-0 overflow-x-auto" do %>
+      <table class="w-full border-collapse text-left">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">期間 (Period)</th>
+            <th class="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">所属組織 (Org Unit)</th>
+            <th class="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">取得される権限 (Permissions)</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <% @assignments.each do |assignment| %>
+            <tr class="hover:bg-gray-50 transition-all">
+              <td class="px-4 py-4 text-sm text-gray-600">
+                <span class="font-medium text-gray-900"><%= assignment.start_date %></span>
+                <span class="mx-1 text-gray-400">〜</span>
+                <span class="font-medium text-gray-900"><%= assignment.end_date || "現在" %></span>
+              </td>
+              <td class="px-4 py-4 text-sm font-semibold text-gray-900">
+                <%= assignment.org_unit.name %>
+              </td>
+              <td class="px-4 py-4 text-sm">
+                <% if assignment.org_unit.org_unit_permissions.any? %>
+                  <div class="flex flex-wrap gap-1.5">
+                    <% assignment.org_unit.org_unit_permissions.each do |perm| %>
+                      <%= render "shared/badge", color: :emerald, label: perm.permission_name %>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <span class="text-gray-400 text-xs italic">権限定義なし</span>
+                <% end %>
+              </td>
             </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100">
-            <% @assignments.each do |assignment| %>
-              <tr class="hover:bg-gray-50 transition-all">
-                <td class="px-4 py-4 text-sm text-gray-600">
-                  <span class="font-medium text-gray-900"><%= assignment.start_date %></span>
-                  <span class="mx-1 text-gray-400">〜</span>
-                  <span class="font-medium text-gray-900"><%= assignment.end_date || "現在" %></span>
-                </td>
-                <td class="px-4 py-4 text-sm font-semibold text-gray-900">
-                  <%= assignment.org_unit.name %>
-                </td>
-                <td class="px-4 py-4 text-sm">
-                  <% if assignment.org_unit.org_unit_permissions.any? %>
-                    <div class="flex flex-wrap gap-1.5">
-                      <% assignment.org_unit.org_unit_permissions.each do |perm| %>
-                        <span class="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-semibold border border-emerald-200">
-                          <%= perm.permission_name %>
-                        </span>
-                      <% end %>
-                    </div>
-                  <% else %>
-                    <span class="text-gray-400 text-xs italic">権限定義なし</span>
-                  <% end %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    </div>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
   </div>
 </div>

@@ -1,0 +1,15 @@
+<%# [意図] 全画面で共通の「顔」となる見出しのデザインを統一し、変更を一箇所で管理するため。 %>
+<%# [意味] タイトル、説明文、およびボタン類（actions）を美しく並べるページヘッダー部品。 %>
+<div class="flex justify-between items-center mb-8 pb-6 border-b border-gray-200">
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900 border-l-4 border-blue-600 pl-4">
+      <%= title %>
+    </h1>
+    <% if local_assigns[:subtitle] %>
+      <p class="mt-2 text-gray-500 text-sm"><%= subtitle %></p>
+    <% end %>
+  </div>
+  <div class="flex gap-4">
+    <%= actions if local_assigns[:actions] %>
+  </div>
+</div>

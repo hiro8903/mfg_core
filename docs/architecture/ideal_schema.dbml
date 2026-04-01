@@ -62,7 +62,33 @@ Table assignments {
   Note: '【ADR 002】誰が・どこで・何の役割を「いつからいつまで」担っているかの履歴'
 }
 
-// -------------------- II. 在庫・場所管理 (Inventory & Storage) --------------------
+// -------------------- II. 品目・構成・在庫管理 (Items & Inventory) --------------------
+
+Table items {
+  id integer [primary key]
+  item_code varchar [unique, not null, note: '品目コード']
+  name varchar [not null, note: '品目名称']
+  item_type integer [not null, note: '品目区分 (1:受託基材, 2:完成品, 3:購入セット品, 4:購入原材料, 5:内製中間材等)']
+  manufacturer_name varchar [note: '購入品の場合の製造元']
+  inventory_unit varchar [note: '在庫管理単位 (kg, 個等)']
+  has_lot_control boolean [default: false, note: 'ロット管理対象か']
+  created_at timestamp
+  updated_at timestamp
+
+  Note: '【ADR 007】商品マスタと品番マスタを統合した単一の品目マスタ'
+}
+
+Table item_boms {
+  id integer [primary key]
+  parent_item_id integer [not null, ref: > items.id, note: '作られる親品目']
+  child_item_id integer [not null, ref: > items.id, note: '消費される子品目']
+  standard_quantity decimal [not null, note: '標準消費数量']
+  yield_rate decimal [note: '歩留率']
+  created_at timestamp
+  updated_at timestamp
+
+  Note: '【ADR 007】品目を組み合わせて別の品目を作る（調合・構成）自己参照BOM'
+}
 
 Table locations {
   id integer [primary key]
@@ -76,7 +102,7 @@ Table locations {
 
 Table inventories {
   id integer [primary key]
-  item_id integer [note: '品番マスタ参照用（将来拡張）']
+  item_id integer [not null, ref: > items.id, note: '品目マスタ参照']
   org_unit_id integer [not null, ref: > org_units.id, note: '論理的所有組織 (必須・会計単位)']
   location_id integer [ref: > locations.id, note: '物理的場所 (任意・棚卸単位)']
   quantity decimal [not null, default: 0, note: '在庫数量']

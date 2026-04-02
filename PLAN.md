@@ -117,13 +117,13 @@
     - 📄 [`006-business-partner-and-delivery-model.md`](./docs/architecture/adr/006-business-partner-and-delivery-model.md)
 - [x] **ADR 007: 品目マスタの統合とBOMアーキテクチャ**
     - 📄 [`007-item-master-and-bom-integration.md`](./docs/architecture/adr/007-item-master-and-bom-integration.md)
-- [/] **Phase 1: 環境整備（論理削除基盤）**
+- [x] **Phase 1: 環境整備（論理削除基盤）**
     - [x] `Gemfile` への `discard` gem の追記
-    - [ ] `bundle install` の実行によるインストール
-    - [ ] 既存の `User` モデル等を `Discard::Model` 対応にリファクタリング
+    - [x] `bundle install` の実行によるインストール
+    - [x] 既存の `User` モデル等を `Discard::Model` 対応にリファクタリング
 - [ ] **Phase 2: 取引先・納入先マスタ（BusinessPartner）の実装**
-    - [ ] `BusinessPartner` モデル & マイグレーション作成
-    - [ ] `DeliveryDestination` モデル & マイグレーション作成
+    - [x] `BusinessPartner` のアーキテクチャ設計とマイグレーションの絶対的な定義完了（※DB反映待ち）
+    - [ ] `DeliveryDestination` モデル & マイグレーションの設計・見直し
     - [ ] バリデーション・リレーションの設定（ADR 006 準拠）
     - [ ] 取引先の一覧・詳細画面の構築 (Tailwind v4 使用)
 - [ ] **Phase 3: 品目・構成マスタ（Item / ItemBOM）の実装**

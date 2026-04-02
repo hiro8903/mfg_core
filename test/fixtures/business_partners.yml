@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  partner_code: MyString
+  name: MyString
+  is_customer: false
+  is_supplier: false
+  is_manufacturer: false
+  discarded_at: 2026-04-02 08:55:06
+
+two:
+  partner_code: MyString
+  name: MyString
+  is_customer: false
+  is_supplier: false
+  is_manufacturer: false
+  discarded_at: 2026-04-02 08:55:06

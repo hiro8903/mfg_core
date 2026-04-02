@@ -4,9 +4,9 @@ class UsersController < ApplicationController
   def index
     # 退職済み(discarded)を表示するか、現職のみを表示するかを切り替え
     if params[:discarded] == "true"
-      @users = User.where.not(discarded_at: nil)
+      @users = User.discarded
     else
-      @users = User.where(discarded_at: nil)
+      @users = User.kept
     end
 
     # 共通の並び替えとプリロード処理
@@ -45,13 +45,13 @@ class UsersController < ApplicationController
 
   def destroy
     # データを消さずに、退職日時をセットして「無効化 (Discard)」する
-    @user.update!(discarded_at: Time.current)
+    @user.discard!
     redirect_to users_path, notice: "ユーザー [#{@user.user_code}] を退職処理しました。一覧から除外されました。", status: :see_other
   end
 
   def undiscard
     # 退職状態を解除（nil に戻す）
-    @user.update!(discarded_at: nil)
+    @user.undiscard!
     redirect_to users_path, notice: "ユーザー [#{@user.user_code}] の退職処理を取り消しました。現職に復帰しました。"
   end
 

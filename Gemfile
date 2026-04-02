@@ -67,3 +67,8 @@ end
 
 gem "tailwindcss-rails", "~> 4.4"
 
+# ADR 004/006: データの安全性を担保するための論理削除（Discard）を実現する Gem
+# 公式: https://github.com/jhawthorn/discard
+gem "discard", "~> 1.4"
+
+

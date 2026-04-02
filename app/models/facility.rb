@@ -1,4 +1,5 @@
 class Facility < ApplicationRecord
+  include Discard::Model
   # [意図] この拠点に配属されている人の履歴を引くため。
   has_many :assignments, dependent: :destroy
   has_many :users, through: :assignments

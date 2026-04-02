@@ -1,4 +1,5 @@
 class OrgUnit < ApplicationRecord
+  include Discard::Model
   # [意図] 部・課・班といった階層構造を1つのテーブルで管理するため。
   # [意味] `parent` は親組織, `children` はその配下にある子組織を返す。
   belongs_to :parent, class_name: "OrgUnit", optional: true

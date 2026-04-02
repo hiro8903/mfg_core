@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  include Discard::Model
+
   # [意図] パスワードを平文ではなく、暗号化（ハッシュ化）して保存するための設定。
   # [意味] `has_secure_password` を使うと、`password` と `password_confirmation` という
   #        属性が自動で使えるようになり、DBには安全な `password_digest`（暗号文）だけが保存される。

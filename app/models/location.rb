@@ -1,4 +1,5 @@
 class Location < ApplicationRecord
+  include Discard::Model
   # [意図] この在庫ロケーション（棚など）がどの拠点に属しているか。
   belongs_to :facility
 

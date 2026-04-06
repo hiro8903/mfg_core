@@ -30,7 +30,7 @@
         <th class="px-4 py-3 font-semibold text-gray-700">業務 ID</th>
         <th class="px-4 py-3 font-semibold text-gray-700">氏名 (Name)</th>
         <th class="px-4 py-3 font-semibold text-gray-700">主な所属組織 (Org Unit)</th>
-        <th class="px-4 py-3 font-semibold text-gray-700">拠点 (Facility)</th>
+        <th class="px-4 py-3 font-semibold text-gray-700">拠点 (Site)</th>
         <th class="px-4 py-3 font-semibold text-gray-700 text-center w-60 whitespace-nowrap">操作 (Action)</th>
       </tr>
     </thead>
@@ -46,7 +46,7 @@
           </td>
           <td class="p-4 text-gray-600">
             <%# 元の拠点取得ロジックをそのまま継承 %>
-            <%= user.facilities.map(&:name).join(", ").presence || "-" %>
+            <%= user.sites.map(&:name).join(", ").presence || "-" %>
           </td>
           <td class="p-4 text-center whitespace-nowrap">
             <div class="flex gap-2 justify-center">

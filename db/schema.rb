@@ -10,32 +10,78 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_25_004515) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_01_235507) do
   create_table "assignments", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.date "end_date"
-    t.integer "facility_id", null: false
     t.boolean "is_primary", default: true, null: false
     t.string "job_title"
     t.integer "org_unit_id", null: false
     t.integer "role", default: 0, null: false
+    t.integer "site_id", null: false
     t.date "start_date", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
-    t.index ["facility_id"], name: "index_assignments_on_facility_id"
     t.index ["org_unit_id"], name: "index_assignments_on_org_unit_id"
+    t.index ["site_id"], name: "index_assignments_on_site_id"
     t.index ["user_id"], name: "index_assignments_on_user_id"
   end
 
-  create_table "facilities", force: :cascade do |t|
-    t.text "address"
-    t.string "code", null: false
+  create_table "business_partners", force: :cascade do |t|
+    t.string "address"
+    t.string "business_type"
+    t.bigint "capital_amount"
+    t.string "corporate_number"
     t.datetime "created_at", null: false
     t.datetime "discarded_at"
+    t.string "fax_number"
+    t.text "internal_memo"
+    t.string "invoice_registration_number"
+    t.boolean "is_customer", default: false, null: false
+    t.boolean "is_manufacturer", default: false, null: false
+    t.boolean "is_supplier", default: false, null: false
     t.string "name", null: false
+    t.string "name_kana"
+    t.integer "parent_id"
+    t.string "partner_code", null: false
+    t.string "phone_number"
+    t.string "postal_code"
+    t.string "search_keywords"
+    t.string "short_name", null: false
+    t.integer "trade_status", default: 0, null: false
     t.datetime "updated_at", null: false
-    t.index ["code"], name: "index_facilities_on_code", unique: true
-    t.index ["discarded_at"], name: "index_facilities_on_discarded_at"
+    t.string "website_url"
+    t.index ["discarded_at"], name: "index_business_partners_on_discarded_at"
+    t.index ["parent_id"], name: "index_business_partners_on_parent_id"
+    t.index ["partner_code"], name: "index_business_partners_on_partner_code", unique: true
+  end
+
+  create_table "delivery_destinations", force: :cascade do |t|
+    t.string "address"
+    t.integer "business_partner_id", null: false
+    t.string "contact_person_name"
+    t.string "contact_person_org"
+    t.string "contact_person_title"
+    t.datetime "created_at", null: false
+    t.string "destination_code", null: false
+    t.datetime "discarded_at"
+    t.string "email"
+    t.string "fax_number"
+    t.string "honorific_title"
+    t.text "internal_memo"
+    t.boolean "is_active", default: true, null: false
+    t.boolean "is_default", default: false, null: false
+    t.string "name", null: false
+    t.string "name_kana"
+    t.string "phone_number"
+    t.string "postal_code"
+    t.string "search_keywords"
+    t.string "shipping_instruction"
+    t.string "short_name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_partner_id"], name: "index_delivery_destinations_on_business_partner_id"
+    t.index ["destination_code"], name: "index_delivery_destinations_on_destination_code", unique: true
+    t.index ["discarded_at"], name: "index_delivery_destinations_on_discarded_at"
   end
 
   create_table "inventories", force: :cascade do |t|
@@ -53,12 +99,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_004515) do
     t.string "code", null: false
     t.datetime "created_at", null: false
     t.datetime "discarded_at"
-    t.integer "facility_id", null: false
     t.string "name", null: false
+    t.integer "site_id", null: false
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_locations_on_discarded_at"
-    t.index ["facility_id", "code"], name: "index_locations_on_facility_id_and_code", unique: true
-    t.index ["facility_id"], name: "index_locations_on_facility_id"
+    t.index ["site_id", "code"], name: "index_locations_on_site_id_and_code", unique: true
+    t.index ["site_id"], name: "index_locations_on_site_id"
   end
 
   create_table "org_unit_permissions", force: :cascade do |t|
@@ -92,6 +138,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_004515) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "sites", force: :cascade do |t|
+    t.string "address"
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.datetime "discarded_at"
+    t.string "fax_number"
+    t.string "name", null: false
+    t.string "phone_number"
+    t.string "postal_code"
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_sites_on_code", unique: true
+    t.index ["discarded_at"], name: "index_sites_on_discarded_at"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "discarded_at"
@@ -103,12 +163,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_004515) do
     t.index ["user_code"], name: "index_users_on_user_code", unique: true
   end
 
-  add_foreign_key "assignments", "facilities"
   add_foreign_key "assignments", "org_units"
+  add_foreign_key "assignments", "sites"
   add_foreign_key "assignments", "users"
+  add_foreign_key "business_partners", "business_partners", column: "parent_id"
+  add_foreign_key "delivery_destinations", "business_partners"
   add_foreign_key "inventories", "locations"
   add_foreign_key "inventories", "org_units"
-  add_foreign_key "locations", "facilities"
+  add_foreign_key "locations", "sites"
   add_foreign_key "org_unit_permissions", "org_units"
   add_foreign_key "org_units", "org_units", column: "parent_id"
   add_foreign_key "sessions", "users"

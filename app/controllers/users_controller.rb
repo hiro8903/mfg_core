@@ -10,7 +10,7 @@ class UsersController < ApplicationController
     end
 
     # 共通の並び替えとプリロード処理
-    @users = @users.order(:user_code).includes(:facilities, assignments: :org_unit)
+    @users = @users.order(:user_code).includes(:sites, assignments: :org_unit)
   end
 
   def show

@@ -17,7 +17,7 @@ class User < ApplicationRecord
 
   # [意図] 「田中さんの現在の所属部署は？」などの情報を簡単に引けるようにする拡張用。
   has_many :org_units, through: :assignments
-  has_many :facilities, through: :assignments
+  has_many :sites, through: :assignments
 
   # [意図] ユーザーが入力したユーザーコードを、前後の空白を除去して正規化（統一）するため。
   #        「abc 」と「abc」を同じものとして扱いたい。

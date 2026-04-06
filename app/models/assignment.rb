@@ -1,7 +1,7 @@
 class Assignment < ApplicationRecord
-  # [意図] 人事履歴の交差点。誰が（User）・どこで（Facility）・どの組織で（OrgUnit）を紐付ける。
+  # [意図] 人事履歴の交差点。誰が（User）・どこで（Sity）・どの組織で（OrgUnit）を紐付ける。
   belongs_to :user
-  belongs_to :facility
+  belongs_to :site
   belongs_to :org_unit
 
   # [意図] 配属先での役割（役職種別）を管理するため。

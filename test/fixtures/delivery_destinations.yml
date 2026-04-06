@@ -1,0 +1,11 @@
+one:
+  business_partner: one
+  destination_code: "DEST-001"
+  name: "Yokohama Factory"
+  short_name: "Yokohama"
+
+two:
+  business_partner: two
+  destination_code: "DEST-002"
+  name: "Osaka Warehouse"
+  short_name: "Osaka"

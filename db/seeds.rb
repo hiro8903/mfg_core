@@ -4,13 +4,13 @@ Assignment.destroy_all
 Inventory.destroy_all
 Location.destroy_all
 OrgUnit.destroy_all
-Facility.destroy_all
+Site.destroy_all
 Session.destroy_all
 User.destroy_all
 
 # 1. 拠点の作成 (Facilities)
 puts "Creating Facilities..."
-tokyo_factory = Facility.create!(
+tokyo_factory = Site.create!(
   code: "F001",
   name: "東京第一工場",
   address: "東京都中央区銀座1-1-1"
@@ -40,7 +40,7 @@ safety_committee = OrgUnit.create!(
 # 3. 在庫ロケーションの作成 (Locations)
 puts "Creating Locations..."
 Location.create!(
-  facility: tokyo_factory,
+  site: tokyo_factory,
   code: "LOC-A-01",
   name: "部品倉庫 A-01棚"
 )
@@ -59,7 +59,7 @@ puts "Creating Assignments..."
 # 田中さんを「東京工場」の「製造1課」に配属（メイン所属）
 Assignment.create!(
   user: tanaka,
-  facility: tokyo_factory,
+  site: tokyo_factory,
   org_unit: mfg_section_1,
   job_title: "課長",
   role: 0,
@@ -70,7 +70,7 @@ Assignment.create!(
 # 田中さんを「安全衛生委員会」にも兼務させる
 Assignment.create!(
   user: tanaka,
-  facility: tokyo_factory,
+  site: tokyo_factory,
   org_unit: safety_committee,
   job_title: "委員長",
   role: 0,

@@ -1,124 +1,261 @@
-Project Mfg_Core_Ideal_Architecture {
-  database_type: 'PostgreSQL'
-  Note: '製造業中核アプリケーション：将来の理想的なデータ構造 (Dynamic Permissions & HR Support)'
+// 製造業データモデル：理想設計図 (Ideal Target Schema)
+// Version: 3.0 (Full Scope / Identity & RBAC Integrated)
+
+// -----------------------------------------------------------------------------
+// I. 基礎・取引先・品目マスタ
+// -----------------------------------------------------------------------------
+
+Table item_masters as "商品マスタ" {
+  id integer [pk, increment, note: '商品_ID: 連番 内部キー']
+  item_code varchar [unique, note: '商品_コード: 業務コード']
+  name varchar [note: '商品名: 基材または完成品など']
+  unit varchar [note: '在庫/出荷管理単位']
+  category integer [note: '品目区分: 1:基材 2:完成品 等']
+  manufacturer_name varchar [note: 'メーカー名: 製造元']
+  is_lot_managed boolean [note: 'ロット管理フラグ']
 }
 
-// -------------------- I. ユーザー・組織・人事マスタ (HR) --------------------
-
-Table users {
-  id integer [primary key]
-  user_code varchar [unique, not null, note: 'ログイン用ID (業務コード)']
-  name varchar [not null, note: '氏名（フルネーム）']
-  password_digest varchar [not null, note: '暗号化されたパスワード']
-  discarded_at timestamp [note: '退職・無効化日 (NULLなら有効)']
-  created_at timestamp
-  updated_at timestamp
-
-  Note: '本質的な個人情報を管理。認証の主体。'
+Table process_masters as "工程マスタ" {
+  id integer [pk, increment]
+  process_code varchar [unique, note: '業務コード']
+  name varchar
 }
 
-Table facilities {
-  id integer [primary key]
-  code varchar [unique, not null, note: '拠点・サイトコード (例: L001)']
-  name varchar [not null, note: '拠点名 (例: 東京工場)']
-  address text [note: '住所']
-  discarded_at timestamp [note: '拠点廃止日時 (NULLなら有効)']
-
-  Note: '物理的な拠点（オフィス、工場等）を管理。人事上の配属先。'
+Table skill_masters as "スキルマスタ" {
+  id integer [pk, increment]
+  skill_code varchar [unique, note: '業務コード']
+  name varchar
 }
 
-Table org_units {
-  id integer [primary key]
-  parent_id integer [ref: > org_units.id, note: '親組織 (階層構造用)']
-  code varchar [unique, not null, note: '組織コード (例: D100)']
-  name varchar [not null, note: '組織名 (例: 製造部, 製造1課, 安全委員会)']
-  org_type integer [default: 0, note: '組織種別 (0:部署, 1:PJ, 2:委員会)']
-  discarded_at timestamp [note: '組織廃止日時 (NULLなら有効)']
-
-  Note: '論理的な組織単位。ここに権限が紐付く。'
+Table business_partners as "相手先名称マスタ" {
+  id integer [pk, increment]
+  partner_code varchar [unique, note: '取引先コード']
+  name varchar [note: '仕入先や得意先を兼ねる名称']
+  is_customer boolean [note: '顧客フラグ']
+  is_supplier boolean [note: '仕入先フラグ']
 }
 
-Table org_unit_permissions {
-  id integer [primary key]
-  org_unit_id integer [not null, ref: > org_units.id, note: '組織ID']
-  permission integer [not null, note: '権限種別 (system_admin, manage_hr, view_inventory等)']
-  created_at timestamp
-  updated_at timestamp
-
-  Note: '【ADR 003】組織に権限を紐付け、配属によってユーザーへ継承させる'
+Table delivery_destinations as "発送先マスタ" {
+  id integer [pk, increment]
+  partner_code varchar [ref: > business_partners.partner_code]
+  destination_code varchar [unique, note: '納入先コード']
+  name varchar [note: '納入先名称']
+  address varchar
 }
 
-Table assignments {
-  id integer [primary key]
-  user_id integer [not null, ref: > users.id]
-  facility_id integer [not null, ref: > facilities.id]
-  org_unit_id integer [not null, ref: > org_units.id]
-  job_title varchar [note: '仕事上の肩書き (人間界の役割)']
-  role integer [default: 0, note: '配属役職区分 (0:作業員, 1:管理者等)']
-  is_primary boolean [default: true, note: '主属フラグ (兼務の場合のメイン所属)']
-  start_date date [not null, note: '適用開始日']
-  end_date date [note: '適用終了日 (NULLなら現行)']
-
-  Note: '【ADR 002】誰が・どこで・何の役割を「いつからいつまで」担っているかの履歴'
+Table locations as "ロケーションマスタ" {
+  id integer [pk, increment]
+  site_id integer [ref: > sites.id, note: '所属拠点']
+  location_code varchar [unique, note: '場所コード']
+  name varchar [note: '場所名']
+  discarded_at datetime
 }
 
-// -------------------- II. 品目・構成・在庫管理 (Items & Inventory) --------------------
-
-Table items {
-  id integer [primary key]
-  item_code varchar [unique, not null, note: '品目コード']
-  name varchar [not null, note: '品目名称']
-  item_type integer [not null, note: '品目区分 (1:受託基材, 2:完成品, 3:購入セット品, 4:購入原材料, 5:内製中間材等)']
-  manufacturer_name varchar [note: '購入品の場合の製造元']
-  inventory_unit varchar [note: '在庫管理単位 (kg, 個等)']
-  has_lot_control boolean [default: false, note: 'ロット管理対象か']
-  created_at timestamp
-  updated_at timestamp
-
-  Note: '【ADR 007】商品マスタと品番マスタを統合した単一の品目マスタ'
+Table item_bom_specs as "品番マスタ" {
+  id integer [pk, increment]
+  part_number varchar [unique, note: '業務コード']
+  name varchar [note: '原材料や資材の名称']
+  manufacturer_name varchar
+  unit varchar
+  is_lot_managed boolean
 }
 
-Table item_boms {
-  id integer [primary key]
-  parent_item_id integer [not null, ref: > items.id, note: '作られる親品目']
-  child_item_id integer [not null, ref: > items.id, note: '消費される子品目']
-  standard_quantity decimal [not null, note: '標準消費数量']
-  yield_rate decimal [note: '歩留率']
-  created_at timestamp
-  updated_at timestamp
-
-  Note: '【ADR 007】品目を組み合わせて別の品目を作る（調合・構成）自己参照BOM'
+Table engineering_specs as "技術情報マスタ" {
+  id integer [pk, increment]
+  part_number varchar [ref: > item_bom_specs.part_number]
+  recommended_temp varchar [note: '推奨保管温度']
+  hazard_class varchar [note: '危険物区分']
+  expiry_months integer [note: '消費有効期限(月)']
 }
 
-Table locations {
-  id integer [primary key]
-  facility_id integer [not null, ref: > facilities.id, note: '所属拠点']
-  code varchar [unique, not null, note: '場所コード (例: W001-S01-A)']
-  name varchar [not null, note: '場所名 (例: 倉庫A-棚B1)']
-  discarded_at timestamp [note: '場所廃止日時']
+// -----------------------------------------------------------------------------
+// II. 品質基準
+// -----------------------------------------------------------------------------
 
-  Note: '物理的置き場所（棚・部屋等）'
+Table inspection_items as "検査項目マスタ" {
+  id integer [pk, increment]
+  item_code varchar [unique, note: '業務コード']
+  name varchar
+  unit varchar
 }
 
-Table inventories {
-  id integer [primary key]
-  item_id integer [not null, ref: > items.id, note: '品目マスタ参照']
-  org_unit_id integer [not null, ref: > org_units.id, note: '論理的所有組織 (必須・会計単位)']
-  location_id integer [ref: > locations.id, note: '物理的場所 (任意・棚卸単位)']
-  quantity decimal [not null, default: 0, note: '在庫数量']
-
-  Note: '論理的所有と物理場所を両立させるハイブリッド設計'
+Table standard_inspection_norms as "標準検査基準マスタ" {
+  id integer [pk, increment]
+  item_code varchar [ref: > item_masters.item_code]
+  process_code varchar [ref: > process_masters.process_code]
+  inspection_item_code varchar [ref: > inspection_items.item_code]
+  quality_grade varchar [note: '品質等級']
+  min_value decimal
+  max_value decimal
 }
 
-// -------------------- III. 認証・ログイン --------------------
+Table customer_inspection_norms as "個別検査基準マスタ" {
+  id integer [pk, increment]
+  partner_code varchar [ref: > business_partners.partner_code]
+  item_code varchar [ref: > item_masters.item_code]
+  inspection_item_code varchar [ref: > inspection_items.item_code]
+  quality_grade varchar
+  min_value decimal
+  max_value decimal
+}
 
-Table sessions {
-  id integer [primary key]
-  user_id integer [not null, ref: > users.id]
+// -----------------------------------------------------------------------------
+// III. ユーザー・組織・権限 (Identity/RBAC)
+// -----------------------------------------------------------------------------
+
+Table users as "ユーザーマスタ" {
+  id integer [pk, increment]
+  user_code varchar [unique, note: 'ログインID']
+  name varchar [note: '氏名']
+  password_digest varchar
+  user_category integer [note: '0:内 10:外 80:サ']
+  employment_type integer [note: '0:正 10:契約 20:派遣']
+  business_partner_id integer [ref: > business_partners.id, note: '雇用元のBusinessPartner参照']
+  discarded_at datetime
+}
+
+Table sites as "拠点マスタ" {
+  id integer [pk, increment]
+  site_code varchar [unique, note: 'コード']
+  name varchar [note: '名称']
+  zip_code varchar
+  address varchar
+  phone_number varchar
+  discarded_at datetime
+}
+
+Table org_units as "組織単位マスタ" {
+  id integer [pk, increment]
+  parent_id integer [ref: > org_units.id, note: '組織階層']
+  org_code varchar [unique, note: '組織コード']
+  name varchar
+  org_type integer [note: '0:部署 1:PJ 2:委員会']
+}
+
+Table org_unit_permissions as "組織権限マスタ" {
+  id integer [pk, increment]
+  org_unit_id integer [ref: > org_units.id]
+  role integer [note: '役割ID (100単位ブロック)']
+  permission_key varchar [note: '機能キー']
+  permission_level integer [note: '0:R 1:E 2:A']
+}
+
+Table assignments as "配属辞令履歴" {
+  id integer [pk, increment]
+  user_id integer [ref: > users.id]
+  site_id integer [ref: > sites.id]
+  org_unit_id integer [ref: > org_units.id]
+  job_title varchar [note: '役職・肩書き']
+  role integer [note: '役割ID (100単位ブロック)']
+  is_primary boolean [note: 'メイン所属フラグ']
+  start_date date
+  end_date date
+}
+
+Table sessions as "セッションマスタ" {
+  id integer [pk, increment]
+  user_id integer [ref: > users.id]
   ip_address varchar
   user_agent varchar
-  created_at timestamp
-  updated_at timestamp
+  created_at datetime
+}
 
-  Note: 'Rails 8 Native Authentication'
+Table user_skills as "ユーザースキル関連" {
+  id integer [pk, increment]
+  user_id integer [ref: > users.id]
+  skill_id integer [ref: > skill_masters.id]
+}
+
+Table wage_rates as "人員賃率データ" {
+  id integer [pk, increment]
+  user_id integer [ref: > users.id]
+  base_rate decimal [note: '標準賃率']
+  start_date date
+}
+
+// -----------------------------------------------------------------------------
+// IV. 生産・BOM・在庫
+// -----------------------------------------------------------------------------
+
+Table item_recipes as "標準レシピマスタ" {
+  id integer [pk, increment]
+  recipe_code varchar [unique]
+  output_item_code varchar [ref: > item_masters.item_code, note: '完成品']
+  input_item_code varchar [ref: > item_masters.item_code, note: '基材']
+}
+
+Table item_consumptions as "商品構成・消費データ" {
+  id integer [pk, increment]
+  item_code varchar [ref: > item_masters.item_code]
+  process_code varchar [ref: > process_masters.process_code]
+  part_number varchar [ref: > item_bom_specs.part_number]
+  standard_quantity decimal
+}
+
+Table inventories as "在庫データ" {
+  id integer [pk, increment]
+  part_number varchar [ref: > item_bom_specs.part_number]
+  org_unit_id integer [ref: > org_units.id, note: '論理所有']
+  location_id integer [ref: > locations.id, note: '物理場所']
+  quantity decimal
+}
+
+Table inventory_moves as "在庫移動データ" {
+  id integer [pk, increment]
+  move_type varchar
+  part_number varchar [ref: > item_bom_specs.part_number]
+  quantity decimal
+  from_location_id integer [ref: > locations.id]
+  to_location_id integer [ref: > locations.id]
+}
+
+// -----------------------------------------------------------------------------
+// V. 取引（購買・見積・受注・生産）
+// -----------------------------------------------------------------------------
+
+Table quotations as "見積データ" {
+  id integer [pk, increment]
+  part_number varchar [ref: > item_bom_specs.part_number]
+  partner_code varchar [ref: > business_partners.partner_code]
+  unit_price decimal
+}
+
+Table purchase_orders as "発注データ" {
+  id integer [pk, increment, note: '発注データ']
+  po_code varchar [unique]
+  partner_code varchar [ref: > business_partners.partner_code]
+  order_date date
+}
+
+Table sales_orders as "受注データ" {
+  id integer [pk, increment]
+  so_code varchar [unique]
+  partner_code varchar [ref: > business_partners.partner_code]
+  order_date date
+}
+
+Table sales_order_lines as "受注明細データ" {
+  id integer [pk, increment]
+  so_code varchar [ref: > sales_orders.so_code]
+  item_code varchar [ref: > item_masters.item_code]
+  destination_code varchar [ref: > delivery_destinations.destination_code]
+  quantity decimal
+  unit_price decimal
+}
+
+Table work_orders as "作業指示データ" {
+  id integer [pk, increment]
+  wo_code varchar [unique]
+  so_line_id integer [ref: > sales_order_lines.id]
+  item_code varchar [ref: > item_masters.item_code]
+  process_code varchar [ref: > process_masters.process_code]
+}
+
+Table work_results as "作業実績データ" {
+  id integer [pk, increment]
+  wo_code varchar [ref: > work_orders.wo_code]
+  user_code varchar [ref: > users.user_code]
+  start_at datetime
+  completed_at datetime
+  result_status varchar [note: '合否']
 }

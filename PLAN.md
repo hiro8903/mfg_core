@@ -75,9 +75,19 @@
     - [x] 現状の ER 図を出力。
         - 💻 `bin/rake dbml:export`
         - 📂 ER 図（実績）: [`db/schema.dbml`](./db/schema.dbml)
+- [x] **ADR 008: 製造リソースの包括的管理のための拠点名称変更 (Facility to Site)**
+    - 📄 [`008-rename-facility-to-site.md`](./docs/architecture/adr/008-rename-facility-to-site.md)
+    - [x] **アイデンティティ属性の拡張**: `user_category` / `employment_type` 導入による身分の厳密化。
+        - 📂 [`db/migrate/20260324113517_create_personnel_base.rb`](./db/migrate/20260324113517_create_personnel_base.rb) (反映済み)
+- [x] **ADR 009: 階層継承型 RBAC (Role-Based Access Control) の確立**
+    - 📄 [`009-role-based-acl-and-representation.md`](./docs/architecture/adr/009-role-based-acl-and-representation.md)
+    - [x] **組織権限テーブルの高度化**: `role` カラム追加とユニーク制約の再定義。
+        - 📂 [`db/migrate/20260325004515_create_org_unit_permissions.rb`](./db/migrate/20260325004515_create_org_unit_permissions.rb)
+    - [x] **権限運用ガイドの策定**: 具体的な登録パターンと 6 ブロック役割設計の定義。
+        - 📂 [`docs/guides/permission-registration-patterns.md`](./docs/guides/permission-registration-patterns.md)
 - [x] **テストデータ投入 (Seed: 初期データの種まき)**。
     - 💻 `bin/rails db:seed`
-    - 登録モデル: `Facility`, `OrgUnit`, `Location`, `User`, `Assignment`
+    - 登録モデル: `Site` (旧Facility), `OrgUnit`, `Location`, `User`, `Assignment`
     - 📂 [`db/seeds.rb`](./db/seeds.rb)
 - [x] **ADR 004: 論理削除の方針とトレーサビリティの確保**
     - 📄 [`004-logical-deletion-policy.md`](./docs/architecture/adr/004-logical-deletion-policy.md)
@@ -97,7 +107,7 @@
         - 📂 [`app/views/users/edit.html.erb`](./app/views/users/edit.html.erb)
     - [x] `destroy` (Discard): ユーザーの論理削除（退職・無効化処理）。
         - 📂 [`app/controllers/users_controller.rb`](./app/controllers/users_controller.rb) / [`app/views/users/index.html.erb`](./app/views/users/index.html.erb)
-    - [ ] **配属管理の高度化**: 画面から組織（OrgUnit）や拠点（Facility）を動的に紐付ける機能。
+    - [ ] **配属管理の高度化**: 画面から組織（OrgUnit）や拠点（Site: 旧Facility）を動的に紐付ける機能。
     - [ ] **認可（Pundit）**: `manage_users` 権限を持つユーザーのみが上記操作を行えるようにガード。
 - [ ] 一般ユーザー用のログイン・ログアウト機能の実装。
 

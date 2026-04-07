@@ -1,0 +1,101 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="flex justify-between items-center mb-8 pb-4 border-b border-gray-100">
+    <div>
+      <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">資材要求一覧</h1>
+      <p class="mt-2 text-sm text-gray-500">現場や管理部門からの調達・支給要求を管理します。</p>
+    </div>
+    <%= link_to new_material_request_path, class: "inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-bold rounded-xl shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform hover:-translate-y-0.5" do %>
+      <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      新規要求を作成
+    <% end %>
+  </div>
+
+  <div class="bg-white shadow-xl shadow-gray-100 overflow-hidden sm:rounded-2xl border border-gray-100">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50/50">
+        <tr>
+          <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">申請者</th>
+          <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">目的・理由</th>
+          <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">ステータス</th>
+          <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">作成日時</th>
+          <th scope="col" class="relative px-6 py-4 text-right pr-10">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">操作</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-100">
+        <% @material_requests.each do |material_request| %>
+          <tr class="hover:bg-gray-50/50 transition-colors group">
+            <td class="px-6 py-5 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-indigo-700 text-sm font-bold shadow-sm mr-4 group-hover:scale-110 transition-transform">
+                  <%= material_request.applicant.name[0] %>
+                </div>
+                <div>
+                  <div class="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors"><%= material_request.applicant.name %></div>
+                  <% if material_request.request_org %>
+                    <div class="text-[10px] uppercase font-bold text-gray-400 tracking-tight mt-0.5"><%= material_request.request_org.name %></div>
+                  <% end %>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-5">
+              <div class="text-sm text-gray-700 font-medium truncate max-w-sm"><%= material_request.purpose %></div>
+              <% if material_request.reason.present? %>
+                <div class="text-xs text-gray-400 mt-1 truncate max-w-xs italic">"<%= material_request.reason %>"</div>
+              <% end %>
+            </td>
+            <td class="px-6 py-5 whitespace-nowrap">
+              <% status_label, status_color = case material_request.status
+                   when "draft" then ["下書き", "bg-gray-100 text-gray-600 border-gray-200"]
+                   when "pending_approval" then ["承認待ち", "bg-amber-50 text-amber-600 border-amber-100"]
+                   when "approved" then ["承認済", "bg-emerald-50 text-emerald-600 border-emerald-100"]
+                   when "returned" then ["差戻し", "bg-rose-50 text-rose-600 border-rose-100"]
+                   else [material_request.status.humanize, "bg-gray-100 text-gray-800"]
+                 end %>
+              <span class="px-3 py-1 rounded-lg text-xs font-bold border <%= status_color %> shadow-sm">
+                <%= status_label %>
+              </span>
+            </td>
+            <td class="px-6 py-5 whitespace-nowrap text-xs font-bold text-gray-400">
+              <%= material_request.created_at.strftime("%Y/%m/%d %H:%M") %>
+            </td>
+            <td class="px-6 py-5 whitespace-nowrap text-right pr-10">
+              <div class="flex justify-end items-center space-x-4">
+                <%= link_to material_request, class: "text-gray-400 hover:text-indigo-600 transition-colors p-2 hover:bg-indigo-50 rounded-lg" do %>
+                  <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                <% end %>
+                <%= link_to edit_material_request_path(material_request), class: "text-gray-400 hover:text-amber-600 transition-colors p-2 hover:bg-amber-50 rounded-lg" do %>
+                  <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <% if @material_requests.empty? %>
+      <div class="text-center py-32 bg-gray-50/30">
+        <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-white border border-gray-100 shadow-sm mb-6">
+          <svg class="h-10 w-10 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900">資材要求がありません</h3>
+        <p class="mt-2 text-sm text-gray-500 max-w-xs mx-auto">新しい資材要求を作成して、調達・支給フローを開始してください。</p>
+        <div class="mt-8">
+          <%= link_to new_material_request_path, class: "inline-flex items-center px-6 py-3 border border-transparent shadow-lg text-sm font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 transition-all transform hover:scale-105" do %>
+            新規要求を作成
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

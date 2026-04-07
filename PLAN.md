@@ -179,13 +179,30 @@
 - [x] **動作確認**: `rails db:reset` と `rails db:seed` が正常に通過し、`dbdocs` の ER 図が出力できることを確認。
 
 ---
-*これ以降のタスクはフェーズ1完了後に詳細化します。*
-
-## 📍 フェーズ 2: 生産・工程管理の拡張 (Future Planning)
+<!-- 旧・将来系マイルストーン (Legacy Planning) -->
+<!-- 
+## 📍 (旧)フェーズ 2: 生産・工程管理の拡張 (Future Planning)
 - [ ] `作業指示データ`・`作業実績データ` の導入。
 - [ ] `品目構成マスタ (ItemBOM)` と実際の作業との連携による材料消費計算。
 
-## 📍 フェーズ 3: 購買予測・品質の統合 (Ultimate Goal)
+## 📍 (旧)フェーズ 3: 購買予測・品質の統合 (Ultimate Goal)
 - [ ] 受注情報からの必要量算出、不足する資材の調達計画自動化。
 - [ ] 過去実績からの高度な予測機能への挑戦。
 - [ ] 品質検査と受入フローの完全統合。
+-->
+
+### フェーズ2：資材要求（Material Request）の実装 [完了]
+
+- [x] **Step 1: モデルとマイグレーションの構築**
+    - `MaterialRequest`, `MaterialRequestLine`, `ApprovalActivity` の作成。
+    - `Enum` 定義（status, transaction_type）の実装。
+- [x] **Step 2: ユニットテスト (TDD) の実施**
+    - バリデーションとリレーションのテストをパス。
+- [x] **Step 4: UIの日本語化 (I18n) とブラウザ検証**
+    - `config/locales/ja.yml` の作成とデフォルトロケール設定。
+    - 全画面（一覧・詳細・作成・編集）をプレミアムな日本語UIへ刷新。
+    - **[Bug Fix]** 明細行が保存されない原因の調査とViewロジックの修正。
+- [x] **Step 5: 承認ワークフローの実装**
+    - `submit`, `approve`, `reject` アクションによるステータス遷移の実装。
+    - `ApprovalActivity` への履歴記録。
+    - `Current.user` によるログインユーザーの紐付け。

@@ -1,0 +1,56 @@
+ja:
+  activerecord:
+    models:
+      material_request: "資材要求"
+      material_request_line: "資材要求明細"
+      item: "品目"
+      user: "ユーザー"
+      org_unit: "組織ユニット"
+    attributes:
+      material_request:
+        applicant: "申請者"
+        request_org: "依頼組織"
+        purpose: "目的"
+        reason: "理由"
+        status: "ステータス"
+        transaction_type: "取引区分"
+        statuses:
+          draft: "下書き"
+          pending_approval: "承認待ち"
+          approved: "承認済"
+          returned: "差戻し"
+        transaction_types:
+          standard_purchase: "通常購買"
+          consumable_supply: "消耗品支給"
+          tool_rental: "工具貸出"
+      material_request_line:
+        item: "品目"
+        item_id: "品目マスタ"
+        item_name_free_text: "品名（フリー入力）"
+        order_quantity: "発注数量"
+        order_unit: "発注単位"
+        required_date: "希望納期"
+        statuses:
+          unprocessed: "未処理"
+          allocated: "引当済"
+          ordered: "発注済"
+          received: "入荷済"
+  material_requests:
+    index:
+      title: "資材要求一覧"
+      new_request: "新規要求作成"
+    show:
+      title: "要求詳細"
+      header_info: "基本情報"
+      line_items: "明細項目"
+      approval_history: "承認履歴"
+    form:
+      applicant: "申請者"
+      request_org: "依頼部門"
+      transaction_type: "取引区分"
+      purpose: "使用目的"
+      reason: "理由"
+      item: "品目"
+      quantity: "数量"
+      unit: "単位"
+      required_date: "希望納期"

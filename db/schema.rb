@@ -10,7 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_07_070000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_07_071730) do
+  create_table "accounting_usage_codes", force: :cascade do |t|
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_accounting_usage_codes_on_code", unique: true
+  end
+
+  create_table "approval_activities", force: :cascade do |t|
+    t.string "action"
+    t.integer "approver_id", null: false
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.integer "material_request_id", null: false
+    t.string "step_name"
+    t.datetime "updated_at", null: false
+    t.index ["approver_id"], name: "index_approval_activities_on_approver_id"
+    t.index ["material_request_id"], name: "index_approval_activities_on_material_request_id"
+  end
+
   create_table "assignments", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.date "end_date"
@@ -85,6 +106,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_07_070000) do
     t.index ["discarded_at"], name: "index_delivery_destinations_on_discarded_at"
   end
 
+  create_table "internal_usage_codes", force: :cascade do |t|
+    t.integer "accounting_usage_code_id"
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["accounting_usage_code_id"], name: "index_internal_usage_codes_on_accounting_usage_code_id"
+    t.index ["code"], name: "index_internal_usage_codes_on_code", unique: true
+  end
+
   create_table "inventories", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "item_id"
@@ -137,6 +168,50 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_07_070000) do
     t.index ["discarded_at"], name: "index_locations_on_discarded_at"
     t.index ["site_id", "location_code"], name: "index_locations_on_site_id_and_location_code", unique: true
     t.index ["site_id"], name: "index_locations_on_site_id"
+  end
+
+  create_table "material_request_lines", force: :cascade do |t|
+    t.string "base_unit"
+    t.decimal "base_unit_price", precision: 15, scale: 4
+    t.datetime "created_at", null: false
+    t.integer "item_id"
+    t.string "item_name_free_text"
+    t.text "item_spec_free_text"
+    t.integer "material_request_id", null: false
+    t.decimal "order_quantity", precision: 15, scale: 5
+    t.string "order_unit"
+    t.decimal "packing_factor", precision: 15, scale: 5
+    t.date "required_date"
+    t.integer "status", default: 0, null: false
+    t.decimal "tax_rate", precision: 5, scale: 4, default: "0.1"
+    t.decimal "total_base_quantity", precision: 15, scale: 5
+    t.decimal "unit_price", precision: 15, scale: 4
+    t.datetime "updated_at", null: false
+    t.index ["item_id"], name: "index_material_request_lines_on_item_id"
+    t.index ["material_request_id"], name: "index_material_request_lines_on_material_request_id"
+  end
+
+  create_table "material_requests", force: :cascade do |t|
+    t.integer "applicant_id", null: false
+    t.integer "budget_org_id"
+    t.datetime "created_at", null: false
+    t.integer "created_by_id", null: false
+    t.text "purpose"
+    t.text "reason"
+    t.text "remarks"
+    t.integer "request_org_id"
+    t.boolean "ringi_needed", default: false, null: false
+    t.integer "status", default: 0, null: false
+    t.integer "target_org_id"
+    t.integer "transaction_type", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.integer "usage_code_id"
+    t.index ["applicant_id"], name: "index_material_requests_on_applicant_id"
+    t.index ["budget_org_id"], name: "index_material_requests_on_budget_org_id"
+    t.index ["created_by_id"], name: "index_material_requests_on_created_by_id"
+    t.index ["request_org_id"], name: "index_material_requests_on_request_org_id"
+    t.index ["target_org_id"], name: "index_material_requests_on_target_org_id"
+    t.index ["usage_code_id"], name: "index_material_requests_on_usage_code_id"
   end
 
   create_table "org_unit_permissions", force: :cascade do |t|
@@ -205,11 +280,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_07_070000) do
     t.index ["user_code"], name: "index_users_on_user_code", unique: true
   end
 
+  add_foreign_key "approval_activities", "material_requests"
+  add_foreign_key "approval_activities", "users", column: "approver_id"
   add_foreign_key "assignments", "org_units"
   add_foreign_key "assignments", "sites"
   add_foreign_key "assignments", "users"
   add_foreign_key "business_partners", "business_partners", column: "parent_id"
   add_foreign_key "delivery_destinations", "business_partners"
+  add_foreign_key "internal_usage_codes", "accounting_usage_codes"
   add_foreign_key "inventories", "items"
   add_foreign_key "inventories", "locations"
   add_foreign_key "inventories", "org_units"
@@ -217,6 +295,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_07_070000) do
   add_foreign_key "item_boms", "items", column: "parent_item_id"
   add_foreign_key "items", "org_units", column: "managing_org_id"
   add_foreign_key "locations", "sites"
+  add_foreign_key "material_request_lines", "items"
+  add_foreign_key "material_request_lines", "material_requests"
+  add_foreign_key "material_requests", "internal_usage_codes", column: "usage_code_id"
+  add_foreign_key "material_requests", "org_units", column: "budget_org_id"
+  add_foreign_key "material_requests", "org_units", column: "request_org_id"
+  add_foreign_key "material_requests", "org_units", column: "target_org_id"
+  add_foreign_key "material_requests", "users", column: "applicant_id"
+  add_foreign_key "material_requests", "users", column: "created_by_id"
   add_foreign_key "org_unit_permissions", "org_units"
   add_foreign_key "org_units", "org_units", column: "parent_id"
   add_foreign_key "sessions", "users"

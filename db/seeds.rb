@@ -229,7 +229,7 @@ part_resistor = Item.create!(
 )
 
 # --- 消耗品 ---
-consumable_glove = Item.create!(
+Item.create!(
   item_code: "CS-001",
   name: "静電気防止手袋 Mサイズ",
   unit: "双",
@@ -240,7 +240,7 @@ consumable_glove = Item.create!(
 )
 
 # --- 工具 ---
-tool_soldering = Item.create!(
+Item.create!(
   item_code: "TL-001",
   name: "温調はんだごて FX-951",
   unit: "台",

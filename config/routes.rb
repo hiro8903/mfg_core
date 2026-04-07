@@ -1,4 +1,11 @@
 Rails.application.routes.draw do
+  resources :material_requests do
+    member do
+      patch :submit
+      patch :approve
+      patch :reject # 'returned' status
+    end
+  end
   resources :users do
     member do
       patch :undiscard

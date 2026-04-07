@@ -4,8 +4,8 @@ class BusinessPartner < ApplicationRecord
   has_many :delivery_destinations, dependent: :destroy
 
   # [意図] ホールディングスや支店の親子階層表現（自己参照）
-  belongs_to :parent, class_name: 'BusinessPartner', optional: true
-  has_many :children, class_name: 'BusinessPartner', foreign_key: 'parent_id', dependent: :destroy
+  belongs_to :parent, class_name: "BusinessPartner", optional: true
+  has_many :children, class_name: "BusinessPartner", foreign_key: "parent_id", dependent: :destroy
 
   # [意図] コードや名前が空欄のまま保存されるのを防ぐ。コードは重複も禁止する。
   validates :partner_code, presence: true, uniqueness: true

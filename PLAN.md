@@ -157,6 +157,28 @@
 - [ ] 「入荷」が行われた際に自動的に「個別在庫」が変動する（または連携して手動増減できる）ロジックの構築と画面作成。
 
 ---
+
+## 📍 AI-Led Implementation Phase (`ai/implementation-prototype` ブランチ)
+このフェーズは、`feature/procurement-foundation` までの設計（Ideal Concept）成果を受け継ぎ、最新の `ideal_schema.dbml` に完全に準拠するための第一歩として設定されました。既存テーブルの不整合解消と、全フローの原点となる基盤マスタ群の構築を行います。
+
+### Step 1: プロジェクトの初期化・準備 (AI Branch Initialization)
+- [x] **AI主体開発用ブランチの作成**: 設計主体のブランチから派生。
+    - 💻 `git checkout -b ai/implementation-prototype`
+- [x] **マイグレーションの実行状態の整理**: 一旦開発環境の DB をゼロクリア（リセット）し、`business_partners` などの最新マイグレーションを確実に適用する。
+
+### Step 2: 既存基盤マスタの「理想（Ideal）」へのアップグレード
+- [x] **拠点マスタ (Site) のリネームと整理**: 旧 `facilities` を廃止し、`ideal_schema.dbml` 準拠の `sites` (`site_code`) に修正。
+- [x] **組織マスタ (OrgUnit) の修正**: `code` カラムを `org_code` にリネーム。
+- [x] **組織権限 (OrgUnitPermission) の拡充**: `permission` カラムを `role` に変更し、継承型の要件を満たせる構造に。
+
+### Step 3: 原点となる品目（Item）マスタの実装
+- [x] **品目 (Item) モデルの構築**: 在庫・調達・製造の全プロセスで参照される単一の品目マスタを作成。`is_lot_managed` 等を実装。
+
+### Step 4: シードデータの刷新 (Seed Data Refresh)
+- [x] **`seeds.rb` の更新**: スキーマ変更に合わせて初期データ（拠点、組織、ユーザー、品目、取引先）を投入できるように改修。
+- [x] **動作確認**: `rails db:reset` と `rails db:seed` が正常に通過し、`dbdocs` の ER 図が出力できることを確認。
+
+---
 *これ以降のタスクはフェーズ1完了後に詳細化します。*
 
 ## 📍 フェーズ 2: 生産・工程管理の拡張 (Future Planning)

@@ -4,7 +4,7 @@ class CreateOrgUnitPermissions < ActiveRecord::Migration[8.1]
     # 例：製造部での「承認権限」、資材課での「発注権限」などを管理。
     create_table :org_unit_permissions do |t|
       t.references :org_unit, null: false, foreign_key: true # 対象組織（Dept, Section etc.）
-      
+
       # [意図] その組織における「役割」に対して権限を付与する。 assignments.role と連動。
       t.integer :role, default: 0, null: false             # 役割（0:Member, 1:Leader, 2:Manager 等）
 

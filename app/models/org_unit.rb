@@ -15,6 +15,6 @@ class OrgUnit < ApplicationRecord
   # [意図] 【ADR 003】組織に紐付く権限を取得するため。
   has_many :org_unit_permissions, dependent: :destroy
 
-  validates :code, presence: true, uniqueness: true
+  validates :org_code, presence: true, uniqueness: true
   validates :name, presence: true
 end

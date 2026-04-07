@@ -5,8 +5,8 @@ class Assignment < ApplicationRecord
   belongs_to :org_unit
 
   # [意図] 配属先での役割（役職種別）を管理するため。
-  # 0: 一般作業員（デフォルト）, 1: 管理職・班長等
-  enum :role, { worker: 0, manager: 1 }
+  # 0: 一般作業員(member), 10: リーダー(leader), 20: 管理職(manager), 310: 外部(vendor)
+  enum :role, { member: 0, leader: 10, manager: 20, vendor: 310 }
 
   # [意図] 辞令の有効期間を管理するため。
   validates :start_date, presence: true

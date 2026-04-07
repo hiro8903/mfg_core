@@ -18,7 +18,7 @@ class CreatePersonnelBase < ActiveRecord::Migration[8.0]
     # [意図] 会社の論理的な組織図。原価責任の所在（コストセンター）でもある。
     create_table :org_units do |t|
       t.references :parent, foreign_key: { to_table: :org_units } # 親部署
-      t.string :code, null: false, index: { unique: true } # 組織コード
+      t.string :org_code, null: false, index: { unique: true } # 組織コード
       t.string :name, null: false                          # 組織名（例：製造部、資材課）
       t.integer :org_type, default: 0, null: false           # 0:Dept(部署), 1:PJ(プロジェクト), 2:Committee(委員会)
       t.text :internal_memo                                # 社内向けの共有・申し送り事項（非公開）

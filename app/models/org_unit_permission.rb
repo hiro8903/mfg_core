@@ -1,15 +1,16 @@
 class OrgUnitPermission < ApplicationRecord
   belongs_to :org_unit
 
-  # 【ADR 003】組織に紐付く権限の定義
-  enum :permission, {
-    system_admin: 0,     # 全機能へのフルアクセス
-    manage_users: 1,     # ユーザーマスターの管理
-    manage_hr: 2,        # 人事・配属履歴の管理
-    view_inventory: 3,   # 在庫の閲覧
-    manage_inventory: 4, # 在庫の編集・移動
-    approve_orders: 5    # 発注の承認
-  }
+  # 【ADR 009】組織における役割（role）ごとの権限付与
+  # assignments.role と連動
+  enum :role, { member: 0, leader: 10, manager: 20, vendor: 310 }
 
-  validates :permission, presence: true, uniqueness: { scope: :org_unit_id }
+  # 権限の強さ
+  enum :permission_level, { reader: 0, editor: 1, approver: 2 }
+
+  validates :role, presence: true
+  validates :permission_key, presence: true
+
+  # 同一組織・同一役割に対し、同一の権限キーの重複登録を防ぐ
+  validates :permission_key, uniqueness: { scope: [ :org_unit_id, :role ] }
 end

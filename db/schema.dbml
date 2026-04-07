@@ -1,31 +1,37 @@
-Table "facilities" {
+Table "users" {
   "id" integer [pk, not null]
-  "code" varchar [not null]
+  "user_code" varchar [not null]
   "name" varchar [not null]
-  "address" text
+  "password_digest" varchar [not null]
+  "user_category" integer [not null, default: 0]
+  "employment_type" integer [not null, default: 0]
+  "business_partner_id" bigint
+  "internal_memo" text
   "discarded_at" datetime(6)
   "created_at" datetime(6) [not null]
   "updated_at" datetime(6) [not null]
 
   Indexes {
-    code [unique, name: "index_facilities_on_code"]
-    discarded_at [name: "index_facilities_on_discarded_at"]
+    user_code [unique, name: "index_users_on_user_code"]
+    business_partner_id [name: "index_users_on_business_partner_id"]
+    discarded_at [name: "index_users_on_discarded_at"]
   }
 }
 
 Table "org_units" {
   "id" integer [pk, not null]
   "parent_id" integer
-  "code" varchar [not null]
+  "org_code" varchar [not null]
   "name" varchar [not null]
   "org_type" integer [not null, default: 0]
+  "internal_memo" text
   "discarded_at" datetime(6)
   "created_at" datetime(6) [not null]
   "updated_at" datetime(6) [not null]
 
   Indexes {
     parent_id [name: "index_org_units_on_parent_id"]
-    code [unique, name: "index_org_units_on_code"]
+    org_code [unique, name: "index_org_units_on_org_code"]
     discarded_at [name: "index_org_units_on_discarded_at"]
   }
 }
@@ -33,11 +39,12 @@ Table "org_units" {
 Table "assignments" {
   "id" integer [pk, not null]
   "user_id" integer [not null]
-  "facility_id" integer [not null]
+  "site_id" integer [not null]
   "org_unit_id" integer [not null]
   "job_title" varchar
   "role" integer [not null, default: 0]
   "is_primary" boolean [not null, default: true]
+  "internal_memo" text
   "start_date" date [not null]
   "end_date" date
   "created_at" datetime(6) [not null]
@@ -45,24 +52,176 @@ Table "assignments" {
 
   Indexes {
     user_id [name: "index_assignments_on_user_id"]
-    facility_id [name: "index_assignments_on_facility_id"]
+    site_id [name: "index_assignments_on_site_id"]
     org_unit_id [name: "index_assignments_on_org_unit_id"]
   }
 }
 
-Table "locations" {
+Table "sessions" {
   "id" integer [pk, not null]
-  "facility_id" integer [not null]
-  "code" varchar [not null]
+  "user_id" integer [not null]
+  "ip_address" varchar
+  "user_agent" varchar
+  "created_at" datetime(6) [not null]
+  "updated_at" datetime(6) [not null]
+
+  Indexes {
+    user_id [name: "index_sessions_on_user_id"]
+  }
+}
+
+Table "sites" {
+  "id" integer [pk, not null]
+  "site_code" varchar [not null]
   "name" varchar [not null]
+  "postal_code" varchar
+  "address" varchar
+  "phone_number" varchar
+  "fax_number" varchar
+  "internal_memo" text
   "discarded_at" datetime(6)
   "created_at" datetime(6) [not null]
   "updated_at" datetime(6) [not null]
 
   Indexes {
-    facility_id [name: "index_locations_on_facility_id"]
+    site_code [unique, name: "index_sites_on_site_code"]
+    discarded_at [name: "index_sites_on_discarded_at"]
+  }
+}
+
+Table "locations" {
+  "id" integer [pk, not null]
+  "site_id" integer [not null]
+  "location_code" varchar [not null]
+  "name" varchar [not null]
+  "internal_memo" text
+  "discarded_at" datetime(6)
+  "created_at" datetime(6) [not null]
+  "updated_at" datetime(6) [not null]
+
+  Indexes {
+    site_id [name: "index_locations_on_site_id"]
     discarded_at [name: "index_locations_on_discarded_at"]
-    (facility_id, code) [unique, name: "index_locations_on_facility_id_and_code"]
+    (site_id, location_code) [unique, name: "index_locations_on_site_id_and_location_code"]
+  }
+}
+
+Table "org_unit_permissions" {
+  "id" integer [pk, not null]
+  "org_unit_id" integer [not null]
+  "role" integer [not null, default: 0]
+  "permission_key" varchar [not null]
+  "permission_level" integer [not null, default: 0]
+  "internal_memo" text
+  "created_at" datetime(6) [not null]
+  "updated_at" datetime(6) [not null]
+
+  Indexes {
+    org_unit_id [name: "index_org_unit_permissions_on_org_unit_id"]
+    (org_unit_id, role, permission_key) [unique, name: "idx_org_unit_role_perm_unique"]
+  }
+}
+
+Table "business_partners" {
+  "id" integer [pk, not null]
+  "partner_code" varchar [not null]
+  "name" varchar [not null]
+  "short_name" varchar [not null]
+  "name_kana" varchar
+  "search_keywords" varchar
+  "is_customer" boolean [not null, default: false]
+  "is_supplier" boolean [not null, default: false]
+  "is_manufacturer" boolean [not null, default: false]
+  "parent_id" integer
+  "trade_status" integer [not null, default: 0]
+  "corporate_number" varchar
+  "invoice_registration_number" varchar
+  "capital_amount" bigint
+  "business_type" varchar
+  "postal_code" varchar
+  "address" varchar
+  "phone_number" varchar
+  "fax_number" varchar
+  "website_url" varchar
+  "internal_memo" text
+  "discarded_at" datetime(6)
+  "created_at" datetime(6) [not null]
+  "updated_at" datetime(6) [not null]
+
+  Indexes {
+    parent_id [name: "index_business_partners_on_parent_id"]
+    partner_code [unique, name: "index_business_partners_on_partner_code"]
+    discarded_at [name: "index_business_partners_on_discarded_at"]
+  }
+}
+
+Table "delivery_destinations" {
+  "id" integer [pk, not null]
+  "business_partner_id" integer [not null]
+  "destination_code" varchar [not null]
+  "name" varchar [not null]
+  "short_name" varchar [not null]
+  "name_kana" varchar
+  "search_keywords" varchar
+  "postal_code" varchar
+  "address" varchar
+  "phone_number" varchar
+  "fax_number" varchar
+  "email" varchar
+  "contact_person_org" varchar
+  "contact_person_title" varchar
+  "contact_person_name" varchar
+  "honorific_title" varchar
+  "is_active" boolean [not null, default: true]
+  "is_default" boolean [not null, default: false]
+  "shipping_instruction" varchar
+  "internal_memo" text
+  "discarded_at" datetime(6)
+  "created_at" datetime(6) [not null]
+  "updated_at" datetime(6) [not null]
+
+  Indexes {
+    business_partner_id [name: "index_delivery_destinations_on_business_partner_id"]
+    destination_code [unique, name: "index_delivery_destinations_on_destination_code"]
+    discarded_at [name: "index_delivery_destinations_on_discarded_at"]
+  }
+}
+
+Table "items" {
+  "id" integer [pk, not null]
+  "item_code" varchar [not null]
+  "name" varchar [not null]
+  "unit" varchar [not null]
+  "item_type" integer [not null, default: 0]
+  "manufacturer_name" varchar
+  "is_lot_managed" boolean [not null, default: false]
+  "managing_org_id" integer
+  "min_stock_level" decimal(15,5) [not null, default: 0.0]
+  "internal_memo" text
+  "discarded_at" datetime(6)
+  "created_at" datetime(6) [not null]
+  "updated_at" datetime(6) [not null]
+
+  Indexes {
+    managing_org_id [name: "index_items_on_managing_org_id"]
+    discarded_at [name: "index_items_on_discarded_at"]
+    item_code [unique, name: "index_items_on_item_code"]
+  }
+}
+
+Table "item_boms" {
+  "id" integer [pk, not null]
+  "parent_item_id" integer [not null]
+  "child_item_id" integer [not null]
+  "quantity" decimal(15,5) [not null]
+  "note" text
+  "created_at" datetime(6) [not null]
+  "updated_at" datetime(6) [not null]
+
+  Indexes {
+    parent_item_id [name: "index_item_boms_on_parent_item_id"]
+    child_item_id [name: "index_item_boms_on_child_item_id"]
+    (parent_item_id, child_item_id) [unique, name: "index_item_boms_on_parent_item_id_and_child_item_id"]
   }
 }
 
@@ -81,61 +240,32 @@ Table "inventories" {
   }
 }
 
-Table "sessions" {
-  "id" integer [pk, not null]
-  "user_id" integer [not null]
-  "ip_address" varchar
-  "user_agent" varchar
-  "created_at" datetime(6) [not null]
-  "updated_at" datetime(6) [not null]
-
-  Indexes {
-    user_id [name: "index_sessions_on_user_id"]
-  }
-}
-
-Table "users" {
-  "id" integer [pk, not null]
-  "user_code" varchar [not null]
-  "name" varchar [not null]
-  "password_digest" varchar [not null]
-  "discarded_at" datetime(6)
-  "created_at" datetime(6) [not null]
-  "updated_at" datetime(6) [not null]
-
-  Indexes {
-    user_code [unique, name: "index_users_on_user_code"]
-    discarded_at [name: "index_users_on_discarded_at"]
-  }
-}
-
-Table "org_unit_permissions" {
-  "id" integer [pk, not null]
-  "org_unit_id" integer [not null]
-  "permission" integer [not null]
-  "created_at" datetime(6) [not null]
-  "updated_at" datetime(6) [not null]
-
-  Indexes {
-    org_unit_id [name: "index_org_unit_permissions_on_org_unit_id"]
-    permission [name: "index_org_unit_permissions_on_permission"]
-  }
-}
-
 Ref "fk_rails_54c0512b74":"org_units"."id" < "org_units"."parent_id"
 
 Ref "fk_rails_aa6b76dac2":"users"."id" < "assignments"."user_id"
 
-Ref "fk_rails_075936001b":"facilities"."id" < "assignments"."facility_id"
+Ref "fk_rails_d2a1d11fbf":"sites"."id" < "assignments"."site_id"
 
 Ref "fk_rails_9f093fe183":"org_units"."id" < "assignments"."org_unit_id"
 
-Ref "fk_rails_bd5e419ecb":"facilities"."id" < "locations"."facility_id"
+Ref "fk_rails_758836b4f0":"users"."id" < "sessions"."user_id"
 
-Ref "fk_rails_759ff3e2b4":"org_units"."id" < "inventories"."org_unit_id"
+Ref "fk_rails_48faaad623":"sites"."id" < "locations"."site_id"
+
+Ref "fk_rails_5028ae19e7":"org_units"."id" < "org_unit_permissions"."org_unit_id"
+
+Ref "fk_rails_78824f321f":"business_partners"."id" < "business_partners"."parent_id"
+
+Ref "fk_rails_11d5985fe3":"business_partners"."id" < "delivery_destinations"."business_partner_id"
+
+Ref "fk_rails_456ca7ea22":"org_units"."id" < "items"."managing_org_id"
+
+Ref "fk_rails_4431efae82":"items"."id" < "item_boms"."parent_item_id"
+
+Ref "fk_rails_da59b955d1":"items"."id" < "item_boms"."child_item_id"
 
 Ref "fk_rails_f563371c64":"locations"."id" < "inventories"."location_id"
 
-Ref "fk_rails_758836b4f0":"users"."id" < "sessions"."user_id"
+Ref "fk_rails_759ff3e2b4":"org_units"."id" < "inventories"."org_unit_id"
 
-Ref "fk_rails_5028ae19e7":"org_units"."id" < "org_unit_permissions"."org_unit_id"
+Ref "fk_rails_fcf6633a1e":"items"."id" < "inventories"."item_id"

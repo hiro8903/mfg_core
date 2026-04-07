@@ -6,6 +6,9 @@ class Inventory < ApplicationRecord
   # [意味] optional: true にすることで、まだ棚が決まっていない在庫も登録可能にする。
   belongs_to :location, optional: true
 
+  # [意図] この在庫レコードが対象とする品目。品目未定（仮入庫）のケースを考慮し optional。
+  belongs_to :item, optional: true
+
   # [意図] マイナスの在庫にならないよう最低限のバリデーション。
   validates :quantity, numericality: { greater_than_or_equal_to: 0 }
 end

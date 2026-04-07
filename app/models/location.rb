@@ -6,6 +6,6 @@ class Location < ApplicationRecord
   # [意図] このロケーションに現在置かれている在庫を把握するため。
   has_many :inventories, dependent: :nullify
 
-  validates :code, presence: true, uniqueness: { scope: :site_id }
+  validates :location_code, presence: true, uniqueness: { scope: :site_id }
   validates :name, presence: true
 end

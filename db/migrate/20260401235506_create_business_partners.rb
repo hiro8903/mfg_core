@@ -51,7 +51,6 @@ class CreateBusinessPartners < ActiveRecord::Migration[8.1]
       # [意図] ADR 004/006 に基づく論理削除用の日時保持用。
       t.datetime :discarded_at
 
-      t.text :internal_memo                  # 社内向けの共有・申し送り事項（非公開）
 
       t.timestamps
     end
